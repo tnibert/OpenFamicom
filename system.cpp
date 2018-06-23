@@ -16,7 +16,7 @@ typedef struct cpustate {
 
 class Famicom {
     cpustate * cpu;
-}
+};
 
 // create an abstract class for instructions
 class opcode
@@ -24,6 +24,12 @@ class opcode
     unsigned char * opcode;
     char * opcodestr;
     virtual void action()=0;
-}
+};
 
 // create a hash table for instructions
+
+
+int main()
+{
+    return 0;
+}
