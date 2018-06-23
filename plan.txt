@@ -1,0 +1,50 @@
+OpenFamicom
+
+links:
+http://yizhang82.me/nes-emu-overview
+http://wiki.nesdev.com/w/index.php/Mapper
+http://wiki.nesdev.com/w/index.php/Emulator_tests
+
+HW info:
+
+processor: 6502 (Ricoh 2A03) 1.79 MHZ
+http://www.emulator101.com/6502-emulator.html
+3 8 bit general purpose registers: A, X, and Y
+8 bit register P (status)
+8 bit stack pointer (fixed at RAM address $100, so can address $100-$1ff)
+16 bit program counter
+148 total instructions
+little endian architecture
+
+"PAL versions of the NES (sold in Europe, Asia and Australia) used the Ricoh 2A07 or RP2A07 processor, which was identical to the 2A03 except for a different clock divider and the 50 Hz vertical refresh rate used in the PAL television standard, with the exception of the 16 hard-coded sampling rates for the Delta modulation-encoded sample playback unit. The changes were made in order for sampled sounds to maintain the original pitch of the RP2A03 with the new clock divider."
+
+PPU (Picture Processing Unit)
+Renders 256x240 screen composed of 8x8 tiles for background, up to 64 8x8 or 8x16 sprites for moving objects. It supports pixel-level scrolling (which is a big deal back in that day).
+
+APU (Audio Processing Unit)
+Supporting 2 pulse channel, 1 triangle channel, 1 noise channel, and 1 DMC (delta modulation) channel.
+http://wiki.nesdev.com/w/index.php/APU
+
+Note on cartridges:
+Cartridge boards (and mappers) - there are many different kinds of game catridge boards. They come with game data as ROMsm, sometimes their own battery-backed RAM, or some cases, their own audio processing unit. Most importantly, they also come with special hardware, refered to as mappers, that dynamically maps ROM/RAM into CPU and PPU memory space, bypassing the limitation of 16-bit address space. Some game catridge come with more than 256KB of CHR ROM and swap/map portion of it on demand.
+
+Plan of attack:
+1. Begin by emulating 6502
+    - write tests for each instruction at every stage
+2. Add rom support for test roms
+3. Implement PPU w/o scrolling
+4. Timing - "Make sure your game loop process as the exact cycle as the real hardware by doing some math over elapsed tick count and CPU MHZ"
+5. Add scrolling
+    - http://wiki.nesdev.com/w/index.php/PPU_scrolling
+6. APU
+7. Mappers
+
+Architecture:
+Data structures
+    - Famicom
+        - CPU
+            - structure of registers
+        - PPU
+        - APU
+    - Instructions/opcodes
+        - must have an associated executed function
