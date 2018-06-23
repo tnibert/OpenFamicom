@@ -1,3 +1,6 @@
+#ifndef system_H
+#define system_H
+
 #include <stdint.h>
 
 // 6502 condition codes?
@@ -28,8 +31,4 @@ class opcode
 
 // create a hash table for instructions
 
-
-int main()
-{
-    return 0;
-}
+#endif
