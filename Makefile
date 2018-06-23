@@ -1,4 +1,4 @@
-OBJS = runrom.cpp
+OBJS = runrom.cpp system.cpp
 #
 all:
-	cc $(OBJS) -g -O0 -Wall -o OpenFamicom
+	g++ $(OBJS) -g -O0 -Wall -o OpenFamicom
