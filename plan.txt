@@ -2,8 +2,11 @@ OpenFamicom
 
 links:
 http://yizhang82.me/nes-emu-overview
+http://yizhang82.me/nes-emu-main-loop
+http://wiki.nesdev.com/w/index.php/2A03 <- cpu
 http://wiki.nesdev.com/w/index.php/Mapper
 http://wiki.nesdev.com/w/index.php/Emulator_tests
+http://www.emulator101.com/reference/6502-reference.html
 
 HW info:
 
@@ -28,6 +31,9 @@ http://wiki.nesdev.com/w/index.php/APU
 Note on cartridges:
 Cartridge boards (and mappers) - there are many different kinds of game catridge boards. They come with game data as ROMsm, sometimes their own battery-backed RAM, or some cases, their own audio processing unit. Most importantly, they also come with special hardware, refered to as mappers, that dynamically maps ROM/RAM into CPU and PPU memory space, bypassing the limitation of 16-bit address space. Some game catridge come with more than 256KB of CHR ROM and swap/map portion of it on demand.
 
+Timing:
+Every game runs at 60fps
+
 Plan of attack:
 1. Begin by emulating 6502
     - write tests for each instruction at every stage
@@ -48,3 +54,5 @@ Data structures
         - APU
     - Instructions/opcodes
         - must have an associated executed function
+
+We need threads for CPU, PPU, and APU and they must sync with each other for timing.

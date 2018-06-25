@@ -2,6 +2,13 @@
 #define system_H
 
 #include <stdint.h>
+#include <map>
+#include <string>
+#include <functional>
+#include <memory>
+#include <thread>
+#include <chrono>
+#include <mutex>
 
 // 6502 condition codes?
 typedef struct ConditionCodes {
@@ -23,15 +30,17 @@ class Famicom {
         Famicom(void);
 };
 
-// create an abstract class for instructions
+// class for instructions
 class opcode
 {
-    unsigned char * opcode;
-    char * opcodestr;
+    int code;       // may need to be uint8_t
+    std::string opcodestr;
     public:
-        virtual void action()=0;
+        std::function<void ()> f;
+        opcode(int);
+        void printcode();
 };
 
-// create a hash table for instructions
+std::map<int, std::shared_ptr<opcode> > create_opcode_map(cpustate *);
 
 #endif
