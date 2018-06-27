@@ -33,14 +33,14 @@ class Famicom {
 // class for instructions
 class opcode
 {
-    int code;       // may need to be uint8_t
+    unsigned char * code;       // may need to be uint8_t
     std::string opcodestr;
     public:
         std::function<void ()> f;
-        opcode(int);
+        opcode(unsigned char * ocode);
         void printcode();
 };
 
-std::map<int, std::shared_ptr<opcode> > create_opcode_map(cpustate *);
+std::map<unsigned char *, std::shared_ptr<opcode> > create_opcode_map(cpustate *);
 
 #endif
