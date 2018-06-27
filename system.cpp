@@ -16,8 +16,8 @@ Famicom::Famicom(void) {
     cpu = (cpustate *)calloc(1, sizeof(cpustate));
     //cpu->pc = ?;
 
-    std::map<uint8_t, std::shared_ptr<opcode> > opmap = create_opcode_map(cpu);
-    opmap[0x1a]->f();
+    opmap = create_opcode_map(cpu);
+    //opmap[0x1a]->f();
 }
 
 opcode::opcode(uint8_t ocode)

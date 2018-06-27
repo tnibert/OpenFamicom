@@ -27,5 +27,10 @@ int main(int argc, char**argv)
     //emustate->memory = malloc(0x10000);  //16K
     //emustate->pc = 0;
 
+    /* next: create engine to iterate through buffer,
+        pass opcodes into emulation function,
+        call opcode->f() for each opcode passed in
+        */
+
     return 0;
 }

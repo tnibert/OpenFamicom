@@ -24,10 +24,15 @@ typedef struct cpustate {
     uint16_t pc;
 } cpustate;
 
+
+// this will all definitely need to be refactored e.g. put emulation function in class, etc
+
 class Famicom {
-    cpustate * cpu;
+    //cpustate * cpu;
     public:
         Famicom(void);
+        cpustate * cpu;
+        std::map<uint8_t, std::shared_ptr<opcode> > opmap;
 };
 
 // class for instructions
@@ -43,5 +48,7 @@ class opcode
 };
 
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *);
+
+int emulate6502op(cpustate * state, std::map<uint8_t, std::shared_ptr<opcode> >)
 
 #endif
