@@ -16,11 +16,11 @@ Famicom::Famicom(void) {
     cpu = (cpustate *)calloc(1, sizeof(cpustate));
     //cpu->pc = ?;
 
-    std::map<unsigned char *, std::shared_ptr<opcode> > opmap = create_opcode_map(cpu);
-    //opmap[0x1a]->f();
+    std::map<uint8_t, std::shared_ptr<opcode> > opmap = create_opcode_map(cpu);
+    opmap[0x1a]->f();
 }
 
-opcode::opcode(unsigned char * ocode)
+opcode::opcode(uint8_t ocode)
 {
     code = ocode;
 }
@@ -30,18 +30,18 @@ void opcode::printcode()
     printf("%x\n", code);
 }
 
-std::map<unsigned char *, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu)
+std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu)
 {
-    std::map<unsigned char *, std::shared_ptr<opcode> > opmap;
+    std::map<uint8_t, std::shared_ptr<opcode> > opmap;
 
     // now we need to do this for all opcodes
     //std::function<void ()> f = []() { std::cout <<  << std::endl; };
-    for(unsigned char i = 0x00; i < 0xff; i++)
+    for(uint8_t i = 0x0; i < 0xff; i++)
     {
-        std::shared_ptr<opcode> mycode(new opcode(&i));
-        opmap[&i] = mycode;
-        opmap[&i]->printcode();
-        opmap[&i]->f = [cpu, mycode]() { std::cout << mycode << std::endl; };
+        std::shared_ptr<opcode> mycode(new opcode(i));
+        opmap[i] = mycode;
+        //opmap[i]->printcode();
+        opmap[i]->f = [cpu, mycode]() { printf("%x\n", mycode->code); };
     }
 
     return opmap;
