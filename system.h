@@ -13,12 +13,11 @@
 // class for instructions
 class opcode
 {
-    //uint8_t code;       // may need to be uint8_t
-    std::string opcodestr;
     public:
-        uint8_t code;               // may want to write an accessor
-        std::function<void ()> f;
-        opcode(uint8_t ocode);
+        std::string opcodestr;
+        uint8_t code;                           // may want to write an accessor
+        std::function<void ()> f;               // this doesn't seem to have access to the variables for the opcode object :\
+        opcode(uint8_t, std::string);
         void printcode();
 };
 
@@ -49,6 +48,6 @@ class Famicom {
         uint16_t getpc();
 };
 
-std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *);
+std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *, uint8_t *);
 
 #endif
