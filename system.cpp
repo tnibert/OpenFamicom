@@ -41,9 +41,11 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu)
     {
         std::shared_ptr<opcode> mycode(new opcode(i));
         opmap[i] = mycode;
-        //opmap[i]->printcode();
         opmap[i]->f = [mycode]() { printf("%x\n", mycode->code); };
     }
+    std::shared_ptr<opcode> mycode(new opcode(0xff));
+    opmap[0xff] = mycode;
+    opmap[0xff]->f = [mycode]() { printf("%x\n", mycode->code); };
 
     return opmap;
 }

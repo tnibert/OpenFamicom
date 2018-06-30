@@ -25,13 +25,13 @@ int main(int argc, char**argv)
     // create and init state machine
     Famicom * nes = new Famicom();
 
-    /* next: create engine to iterate through buffer,
-        pass opcodes into emulation function,
-        call opcode->f() for each opcode passed in
-        */
+    /* engine to iterate through buffer,
+       call opcode->f() for each opcode passed in */
 
-    while (nes->getpc() < fsize)
+    /* the following constant is wrong I think */
+    while (nes->getpc() < 65535)     // fsize)
     {
+        //printf("%x : %x\n", nes->getpc(), fsize);
         nes->emulate6502op(buffer);
     }
     return 0;
