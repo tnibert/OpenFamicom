@@ -2,9 +2,18 @@
 
 // we will put this into the Famicom class
 // put memory pointer in Famicom class
-int emulate6502op(cpustate * state, std::map<uint8_t, std::shared_ptr<opcode> > opmap)
+int Famicom::emulate6502op(unsigned char * buf)
 {
-    uint8_t opcode = &state->memory[state->pc];
+    uint8_t opcode = buf[cpu->pc];      // this will need to be read into memory
 
     opmap[opcode]->f();
+
+    cpu->pc++;          // next instruction
+
+    return 0;
+}
+
+uint16_t Famicom::getpc()
+{
+    return cpu->pc;
 }

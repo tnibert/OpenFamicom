@@ -24,13 +24,15 @@ int main(int argc, char**argv)
 
     // create and init state machine
     Famicom * nes = new Famicom();
-    //emustate->memory = malloc(0x10000);  //16K
-    //emustate->pc = 0;
 
     /* next: create engine to iterate through buffer,
         pass opcodes into emulation function,
         call opcode->f() for each opcode passed in
         */
 
+    while (nes->getpc() < fsize)
+    {
+        nes->emulate6502op(buffer);
+    }
     return 0;
 }

@@ -14,7 +14,8 @@ Famicom::Famicom(void) {
     cout << "Famicom object is being created" << endl;
     // initialize cpu state
     cpu = (cpustate *)calloc(1, sizeof(cpustate));
-    //cpu->pc = ?;
+    cpu->pc = 0;                         // may not start at 0
+    memory = new uint8_t[0x800];         // 2 kB of onboard work RAM, cartridges can add
 
     opmap = create_opcode_map(cpu);
     //opmap[0x1a]->f();
@@ -41,7 +42,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu)
         std::shared_ptr<opcode> mycode(new opcode(i));
         opmap[i] = mycode;
         //opmap[i]->printcode();
-        opmap[i]->f = [cpu, mycode]() { printf("%x\n", mycode->code); };
+        opmap[i]->f = [mycode]() { printf("%x\n", mycode->code); };
     }
 
     return opmap;

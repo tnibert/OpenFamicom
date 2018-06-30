@@ -10,6 +10,18 @@
 #include <chrono>
 #include <mutex>
 
+// class for instructions
+class opcode
+{
+    //uint8_t code;       // may need to be uint8_t
+    std::string opcodestr;
+    public:
+        uint8_t code;               // may want to write an accessor
+        std::function<void ()> f;
+        opcode(uint8_t ocode);
+        void printcode();
+};
+
 // 6502 condition codes?
 typedef struct ConditionCodes {
 
@@ -28,27 +40,15 @@ typedef struct cpustate {
 // this will all definitely need to be refactored e.g. put emulation function in class, etc
 
 class Famicom {
-    //cpustate * cpu;
+    cpustate * cpu;
+    uint8_t * memory;
     public:
         Famicom(void);
-        cpustate * cpu;
-        std::map<uint8_t, std::shared_ptr<opcode> > opmap;
-};
-
-// class for instructions
-class opcode
-{
-    //uint8_t code;       // may need to be uint8_t
-    std::string opcodestr;
-    public:
-        uint8_t code;               // may want to write an accessor
-        std::function<void ()> f;
-        opcode(uint8_t ocode);
-        void printcode();
+        std::map<uint8_t, std::shared_ptr<opcode> > opmap;      // can be private
+        int emulate6502op(unsigned char *);
+        uint16_t getpc();
 };
 
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *);
-
-int emulate6502op(cpustate * state, std::map<uint8_t, std::shared_ptr<opcode> >)
 
 #endif
