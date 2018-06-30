@@ -1,0 +1,42 @@
+https://www.youtube.com/watch?v=uP1gWg5ezyY
+opcode is always 8 bits
+16 bit address space
+
+p register - processor status register
+nv-bdizc
+negative
+overflow
+-
+break
+decimal
+interrupt
+zero
+carry
+
+stack pointer and program counter are 16 bits
+stack pointer first 8 bits are all hard coded to 1 - 00000001
+
+64 kb of address space 0x0000 - 0xffff
+first two pages 256 bytes each are special
+zero page - 0x0000 - 0x00ff
+stack - 0x0100 - 0x01ff (counts down)
+
+instruction types:
+- load: lda, ldx, ldy
+- store: sta, stx, sty
+- transfer between registers: tax, tay, tsx, txa, tya, txs
+-alu:
+- read modify write, shift
+    - rol, ror, asl, lsr
+- decrement or increment memory/xyregisters: dec, dex, dey, inc, inx, iny
+- addition and subtraction: adc, sbc
+- logic: and, ora, eor
+- compare: cmp, cpx, cpy
+- bit
+- set and clear flags: clv, sec, sed, sei, clc, cld, cli
+- branch based on flags: bmi, bpl, bvs, bvc, beq, bne, bcs, bcc
+- jumping/routines: jmp, jsr, brk, rts, rti
+- stack: can only push A register and processor status register: pla, plp, pha, php
+
+addressing modes: (9:25)
+- immediate
