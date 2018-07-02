@@ -18,7 +18,7 @@ class opcode
         void printcode();
         std::string opcodestr;
         uint8_t code;                           // may want to write an accessor
-        std::function<void ()> f;               // this doesn't seem to have access to the variables for the opcode object :\
+        std::function<void ()> f;               // this doesn't seem to have access to the variables for the opcode object
 };
 
 typedef struct cpustate {
@@ -41,8 +41,6 @@ class Famicom {
         int emulate6502op(unsigned char *);
         uint16_t getpc();
 };
-
-
 
 class Cartridge {
     /* class to manage .nes files */
