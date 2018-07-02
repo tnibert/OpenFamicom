@@ -14,17 +14,12 @@
 class opcode
 {
     public:
+        opcode(uint8_t, const char [4]);
+        void printcode();
         std::string opcodestr;
         uint8_t code;                           // may want to write an accessor
         std::function<void ()> f;               // this doesn't seem to have access to the variables for the opcode object :\
-        opcode(uint8_t, std::string);
-        void printcode();
 };
-
-// 6502 condition codes?
-typedef struct ConditionCodes {
-
-} ConditionCodes;
 
 typedef struct cpustate {
     uint8_t a;
@@ -34,7 +29,6 @@ typedef struct cpustate {
     uint8_t sp;
     uint16_t pc;
 } cpustate;
-
 
 // this will all definitely need to be refactored e.g. put emulation function in class, etc
 
@@ -46,6 +40,19 @@ class Famicom {
         std::map<uint8_t, std::shared_ptr<opcode> > opmap;      // can be private
         int emulate6502op(unsigned char *);
         uint16_t getpc();
+};
+
+
+
+class Cartridge {
+    /* class to manage .nes files */
+    // https://wiki.nesdev.com/w/index.php/INES
+    uint16_t header;
+    uint8_t * trainer;
+    uint8_t * prgrom;
+    uint8_t * chrrom;
+    uint8_t * PlayChoiceINSTROM;
+    uint8_t * PlayChoicePROM;
 };
 
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *, uint8_t *);

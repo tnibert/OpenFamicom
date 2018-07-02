@@ -15,7 +15,14 @@ Famicom::Famicom(void) {
     // initialize cpu state
     cpu = (cpustate *)calloc(1, sizeof(cpustate));
     cpu->pc = 0;                         // may not start at 0
-    memory = new uint8_t[0x800];         // 2 kB of onboard work RAM, cartridges can add
+    // todo: verify all initial values
+    cpu->a = 0;
+    cpu->x = 0;
+    cpu->y = 0;
+    cpu->p = 0x34;
+    cpu->sp = 0xfd;
+
+    memory = new uint8_t[0xffff];         // 2 kB of onboard work RAM, cartridges can add, 2kb = 0x800
     /* todo: load game rom into memory @ $4020-$FFFF?
         memory map (from https://wiki.nesdev.com/w/index.php/CPU_ALL):
         Address range	Size	Device
@@ -28,11 +35,21 @@ Famicom::Famicom(void) {
         $4000-$4017	$0018	NES APU and I/O registers
         $4018-$401F	$0008	APU and I/O functionality that is normally disabled. See CPU Test Mode.
         $4020-$FFFF	$BFE0	Cartridge space: PRG ROM, PRG RAM, and mapper registers (See Note)
+
+        https://wiki.nesdev.com/w/index.php/Sample_RAM_map
+        sample ram map for 2kb internal ram:
+        $0000-$000F	16 bytes	Local variables and function arguments
+        $0010-$00FF	240 bytes	Global variables accessed most often, including certain pointer tables
+        $0100-$019F	160 bytes	Data to be copied to nametable during next vertical blank (see The frame and NMIs)
+        $01A0-$01FF	96 bytes	Stack
+        $0200-$02FF	256 bytes	Data to be copied to OAM during next vertical blank
+        $0300-$03FF	256 bytes	Variables used by sound player, and possibly other variables
+        $0400-$07FF	1024 bytes	Arrays and less-often-accessed global variables
     */
     opmap = create_opcode_map(cpu, memory);
 }
 
-opcode::opcode(uint8_t ocode, std::string ocodestr)
+opcode::opcode(uint8_t ocode, const char ocodestr[4])
 {
     code = ocode;
     opcodestr = ocodestr;
@@ -51,7 +68,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, ui
     //std::function<void ()> f = []() { std::cout <<  << std::endl; };
     for(uint8_t i = 0x0; i < 0xff; i++)
     {
-        mycode = std::shared_ptr<opcode>(new opcode(i, "test"));
+        mycode = std::shared_ptr<opcode>(new opcode(i, "tes"));
         opmap[i] = mycode;
         opmap[i]->f = [mycode]() { printf("%x\n", mycode->code); };
     }
@@ -59,7 +76,8 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, ui
     // todo: create a function for the following assignment procedure
     // LDA $0314 constant
     // absolute address mode
-    mycode = std::shared_ptr<opcode>(new opcode(0xad, "lda $"));
+    //delete &opmap[0xad];
+    mycode = std::shared_ptr<opcode>(new opcode(0xad, "lda"));
     opmap[0xad] = mycode;
     opmap[0xad]->f = [cpu, mem, mycode]() {
         /*
