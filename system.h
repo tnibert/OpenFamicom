@@ -15,9 +15,9 @@
 class opcode
 {
     public:
-        opcode(uint8_t, const char [4]);
+        opcode(uint8_t, const char *);
         void printcode();
-        std::string opcodestr;
+        const char * opcodestr;
         uint8_t code;                           // may want to write an accessor
         std::function<void ()> f;               // this doesn't seem to have access to the variables for the opcode object
 };

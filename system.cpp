@@ -56,7 +56,7 @@ Famicom::Famicom(unsigned char * rom) {
     opmap = create_opcode_map(cpu, cart->prgrom);
 }
 
-opcode::opcode(uint8_t ocode, const char ocodestr[4])
+opcode::opcode(uint8_t ocode, const char * ocodestr)
 {
     code = ocode;
     opcodestr = ocodestr;
@@ -75,16 +75,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, ui
     //std::function<void ()> f = []() { std::cout <<  << std::endl; };
     for(uint8_t i = 0x0; i < 0xff; i++)
     {
-        mycode = std::shared_ptr<opcode>(new opcode(i, "tes"));
+        mycode = std::shared_ptr<opcode>(new opcode(i, "test"));
         opmap[i] = mycode;
-        opmap[i]->f = [mycode]() { printf("%x\n", mycode->code); };
+        opmap[i]->f = [mycode]() { printf("%x-", mycode->code); };
     }
 
     // todo: create a function for the following assignment procedure
     // LDA $0314 constant
     // absolute address mode
     //delete &opmap[0xad];
-    mycode = std::shared_ptr<opcode>(new opcode(0xad, "lda"));
+    mycode = std::shared_ptr<opcode>(new opcode(0xad, "lda $"));
     opmap[0xad] = mycode;
     opmap[0xad]->f = [cpu, mem, mycode]() {
         /*
@@ -95,13 +95,13 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, ui
          */
         cpu->pc += 1;
         cpu->a = mem[cpu->pc];
-        std::cout << mycode->opcodestr << " " << cpu->a << std::endl;
+        printf("%s%x-", mycode->opcodestr, cpu->a);
     };
 
     // dummy because we can't for loop up to 0xff on a uint8_t
     mycode = std::shared_ptr<opcode>(new opcode(0xff, "test"));
     opmap[0xff] = mycode;
-    opmap[0xff]->f = [mycode]() { printf("%x\n", mycode->code); };
+    opmap[0xff]->f = [mycode]() { printf("%x-", mycode->code); };
 
     return opmap;
 }

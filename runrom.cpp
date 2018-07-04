@@ -34,5 +34,6 @@ int main(int argc, char**argv)
         //printf("%x : %x\n", nes->getpc(), fsize);
         nes->emulate6502op(nes->cart->prgrom);
     }
+    printf("\n\n");
     return 0;
 }
