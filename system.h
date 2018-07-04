@@ -65,7 +65,7 @@ class Memory
     uint8_t * prg;
     public:
         Memory();
-        void loadprgrom(uint8_t *);
+        void loadprgrom(Cartridge *);
         // the following are for reading and writing memory, uint16_t is the address
         void writemem(uint16_t, uint8_t);
         uint8_t readmem(uint16_t);
@@ -73,7 +73,7 @@ class Memory
 
 class Famicom {
     cpustate * cpu;
-    uint8_t * memory;
+    Memory * memory;
     public:
         Famicom(unsigned char *);
         std::map<uint8_t, std::shared_ptr<opcode> > opmap;      // can be private
@@ -84,6 +84,6 @@ class Famicom {
 
 
 
-std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *, uint8_t *);
+std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *, Memory *);
 
 #endif

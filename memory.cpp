@@ -68,14 +68,15 @@ void Memory::writemem(uint16_t addr, uint8_t data)
         // APU and IO registers
         apuioreg[addr-APUIOREGSTART] = data;
     }
-    else if(0x4018 <= addr && addr < PRGROMSTART)
+    else if(CPUTESTMODESTART <= addr && addr < PRGROMSTART)
     {
         // CPU test mode
-        cputestmode[addr-0x4018] = data;
+        cputestmode[addr-CPUTESTMODESTART] = data;
     }
     else if(PRGROMSTART <= addr)
     {
         // PRG area and mapper registers
+        // come to think, we should never be writing to ROM...
         prg[addr-PRGROMSTART] = data;
     }
 
@@ -107,10 +108,10 @@ uint8_t Memory::readmem(uint16_t addr)
         // APU and IO registers
         return apuioreg[addr-APUIOREGSTART];
     }
-    else if(0x4018 <= addr && addr < PRGROMSTART)
+    else if(CPUTESTMODESTART <= addr && addr < PRGROMSTART)
     {
         // CPU test mode
-        return cputestmode[addr-0x4018];
+        return cputestmode[addr-CPUTESTMODESTART];
     }
     else if(PRGROMSTART <= addr)
     {
@@ -122,7 +123,14 @@ uint8_t Memory::readmem(uint16_t addr)
     throw MemoryAccessException;
 }
 
-void Memory::loadprgrom(uint8_t * buf)
+void Memory::loadprgrom(Cartridge * cart)
 {
+    // make prg a reference to the prgrom in cartridge
+    prg = cart->prgrom;
 
+    // copy data stored in cartridge prgrom to memory
+    /*for(int i = 0; i < cart->prgromsize; i++)
+    {
+        prg[i] = cart->prgrom[i];                                     // this copies the data from cart->prgrom to memory[0x4020], not the reference
+    }*/
 }

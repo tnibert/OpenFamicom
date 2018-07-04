@@ -4,7 +4,7 @@
 // put memory pointer in Famicom class
 int Famicom::emulate6502op()
 {
-    uint8_t opcode = memory[cpu->pc];
+    uint8_t opcode = memory->readmem(cpu->pc);
 
     opmap[opcode]->f();
 

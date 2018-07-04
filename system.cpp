@@ -27,14 +27,11 @@ Famicom::Famicom(unsigned char * rom) {
     cart = new Cartridge(rom);
 
     // create memory map
-    memory = new uint8_t[0xffff];         // 2 kB of onboard work RAM, cartridges can add, 2kb = 0x800
+    memory = new Memory();         // 2 kB of onboard work RAM, cartridges can add, 2kb = 0x800
 
-    for(int i = 0; i < cart->prgromsize; i++)
-    {
-        memory[0x4020+i] = cart->prgrom[i];                                     // this copies the data from cart->prgrom to memory[0x4020], not the reference
-    }
+    memory->loadprgrom(cart);
     //printf("prgrom start in memory: %x, cartridge prgrom start: %x\n", memory[0x4020], cart->prgrom);
-    opmap = create_opcode_map(cpu, &memory[0x4020]);
+    opmap = create_opcode_map(cpu, memory);
 }
 
 opcode::opcode(uint8_t ocode, const char * ocodestr)
@@ -48,7 +45,7 @@ void opcode::printcode()
     printf("%x\n", code);
 }
 
-std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, uint8_t * mem)
+std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Memory * mem)
 {
     std::map<uint8_t, std::shared_ptr<opcode> > opmap;
     std::shared_ptr<opcode> mycode;
@@ -72,12 +69,10 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, ui
     opmap[0xad]->f = [cpu, mem, mycode]() {
         /*
          * I don't think this is quite correct, but we'll work with it
-         * need to do a bit shift?
-         * definitely not quite correct, we seg fault as soon as we hit this
-         * probably because we haven't assigned anything to nes memory...
+         * need handle addressing modes I think
          */
         cpu->pc += 1;
-        cpu->a = mem[cpu->pc];
+        cpu->a = mem->readmem(cpu->pc);
         printf("%s%x-", mycode->opcodestr, cpu->a);
     };
 
