@@ -27,7 +27,7 @@ Famicom::Famicom(unsigned char * rom) {
     cart = new Cartridge(rom);
 
     // create memory map
-    memory = new uint8_t[0xffff];         // 2 kB of onboard work RAM, cartridges can add, 2kb = 0x800
+    memory = new uint8_t[0x800];         // 2 kB of onboard work RAM, cartridges can add, 2kb = 0x800
     /* todo: load game rom into memory @ $4020-$FFFF?
         memory map (from https://wiki.nesdev.com/w/index.php/CPU_ALL):
         Address range	Size	Device
@@ -51,7 +51,9 @@ Famicom::Famicom(unsigned char * rom) {
         $0300-$03FF	256 bytes	Variables used by sound player, and possibly other variables
         $0400-$07FF	1024 bytes	Arrays and less-often-accessed global variables
     */
-    opmap = create_opcode_map(cpu, memory);
+    //memory[0x4020] = cart->prgrom;                                     // this copies the data from cart->prgrom to memory[0x4020], not the reference
+    //printf("prgrom start in memory: %x, cartridge prgrom start: %x\n", memory[0x4020], cart->prgrom);
+    opmap = create_opcode_map(cpu, cart->prgrom);
 }
 
 opcode::opcode(uint8_t ocode, const char ocodestr[4])

@@ -45,8 +45,10 @@ Cartridge::Cartridge(unsigned char *buffer)
     //prgrom = new uint8_t[header[4]*1024*2];       // header specifies size of prgrom in 16kb segments
     printf("%x = %d 16kb segs for PRG ROM\n", header[4], header[4]);
     prgrom = &buffer[readloc];
-    readloc += (header[4]*1024*2);                  // todo: store these sizes for prgrom and chrrom, although maybe header is good enough
-    printf("PRG ROM size: %d bytes\n", header[4]*1024*2);
+    printf("%x : %x\n", prgrom, &buffer[readloc]);
+    prgromsize = header[4]*1024*2;
+    readloc += (prgromsize);                  // todo: store these sizes for prgrom and chrrom, although maybe header is good enough
+    printf("PRG ROM size: %d bytes\n", prgromsize);
 
     //chrrom = new uint8_t[header[5]*1024];         // header specified size of chrrom in 8kb segments, value 0 means it uses chrram
     if(header[5])

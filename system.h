@@ -9,6 +9,7 @@
 #include <thread>
 #include <chrono>
 #include <mutex>
+#include <assert.h>
 
 // class for instructions
 class opcode
@@ -34,19 +35,20 @@ typedef struct cpustate {
 class Cartridge {
     /* class to manage .nes files */
     // https://wiki.nesdev.com/w/index.php/INES
-    uint8_t header[16];
-    uint8_t * trainer;
-    uint8_t * prgrom;
-    uint8_t * chrrom;
-    uint8_t * PlayChoiceINSTROM;
-    uint8_t * PlayChoicePROM;
-    uint8_t * prgram;
-    uint8_t flags6;
-    uint8_t flags7;
-    uint8_t flags9;
-    uint8_t flags10;
-public:
-    Cartridge(unsigned char *);
+    public:
+        uint8_t header[16];
+        uint8_t * trainer;
+        uint8_t * prgrom;
+        int prgromsize;
+        uint8_t * chrrom;
+        uint8_t * PlayChoiceINSTROM;
+        uint8_t * PlayChoicePROM;
+        uint8_t * prgram;
+        uint8_t flags6;
+        uint8_t flags7;
+        uint8_t flags9;
+        uint8_t flags10;
+        Cartridge(unsigned char *);
 };
 
 // this will all definitely need to be refactored e.g. put emulation function in class, etc

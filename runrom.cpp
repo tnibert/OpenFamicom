@@ -25,15 +25,14 @@ int main(int argc, char**argv)
     // create and init state machine
     Famicom * nes = new Famicom(buffer);
 
-    return 0;
     /* engine to iterate through buffer,
        call opcode->f() for each opcode passed in */
 
-    /* the following constant is wrong I think */
-    while (nes->getpc() < 65535)     // fsize)
+    /* so this is iterating over the prgrom, which I believe contains the instructions... */
+    while (nes->getpc() < nes->cart->prgromsize)
     {
         //printf("%x : %x\n", nes->getpc(), fsize);
-        nes->emulate6502op(buffer);
+        nes->emulate6502op(nes->cart->prgrom);
     }
     return 0;
 }
