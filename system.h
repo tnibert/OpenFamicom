@@ -11,6 +11,9 @@
 #include <mutex>
 #include <assert.h>
 
+#define PPUREGSTART 0x2000
+#define APUIOREGSTART 0x4000
+#define CPUTESTMODESTART 0x4018
 #define PRGROMSTART 0x4020
 
 // class for instructions
@@ -53,7 +56,20 @@ class Cartridge {
         Cartridge(unsigned char *);
 };
 
-// this will all definitely need to be refactored e.g. put emulation function in class, etc
+class Memory
+{
+    uint8_t * internalram;
+    uint8_t * ppureg;
+    uint8_t * apuioreg;
+    uint8_t * cputestmode;
+    uint8_t * prg;
+    public:
+        Memory();
+        void loadprgrom(uint8_t *);
+        // the following are for reading and writing memory, uint16_t is the address
+        void writemem(uint16_t, uint8_t);
+        uint8_t readmem(uint16_t);
+};
 
 class Famicom {
     cpustate * cpu;
