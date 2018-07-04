@@ -36,10 +36,11 @@ class Cartridge {
     // https://wiki.nesdev.com/w/index.php/INES
     uint8_t header[16];
     uint8_t * trainer;
-    uint8_t * prgrom;
+    uint16_t * prgrom;
     uint8_t * chrrom;
     uint8_t * PlayChoiceINSTROM;
     uint8_t * PlayChoicePROM;
+    uint8_t * prgram;
 public:
     Cartridge(unsigned char *);
 };
