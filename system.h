@@ -22,6 +22,7 @@ class opcode
 };
 
 typedef struct cpustate {
+    // litte endian
     uint8_t a;
     uint8_t x;
     uint8_t y;
@@ -30,28 +31,33 @@ typedef struct cpustate {
     uint16_t pc;
 } cpustate;
 
+class Cartridge {
+    /* class to manage .nes files */
+    // https://wiki.nesdev.com/w/index.php/INES
+    uint8_t header[16];
+    uint8_t * trainer;
+    uint8_t * prgrom;
+    uint8_t * chrrom;
+    uint8_t * PlayChoiceINSTROM;
+    uint8_t * PlayChoicePROM;
+public:
+    Cartridge(unsigned char *);
+};
+
 // this will all definitely need to be refactored e.g. put emulation function in class, etc
 
 class Famicom {
     cpustate * cpu;
     uint8_t * memory;
     public:
-        Famicom(void);
+        Famicom(unsigned char *);
         std::map<uint8_t, std::shared_ptr<opcode> > opmap;      // can be private
         int emulate6502op(unsigned char *);
         uint16_t getpc();
+        Cartridge * cart;
 };
 
-class Cartridge {
-    /* class to manage .nes files */
-    // https://wiki.nesdev.com/w/index.php/INES
-    uint16_t header;
-    uint8_t * trainer;
-    uint8_t * prgrom;
-    uint8_t * chrrom;
-    uint8_t * PlayChoiceINSTROM;
-    uint8_t * PlayChoicePROM;
-};
+
 
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *, uint8_t *);
 

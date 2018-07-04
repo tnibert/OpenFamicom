@@ -9,9 +9,10 @@
 #include <chrono>
 #include <mutex>*/
 
-Famicom::Famicom(void) {
+Famicom::Famicom(unsigned char * rom) {
     using namespace std;
     cout << "Famicom object is being created" << endl;
+
     // initialize cpu state
     cpu = (cpustate *)calloc(1, sizeof(cpustate));
     cpu->pc = 0;                         // may not start at 0
@@ -22,6 +23,10 @@ Famicom::Famicom(void) {
     cpu->p = 0x34;
     cpu->sp = 0xfd;
 
+    // initialize cartridge
+    cart = new Cartridge(rom);
+
+    // create memory map
     memory = new uint8_t[0xffff];         // 2 kB of onboard work RAM, cartridges can add, 2kb = 0x800
     /* todo: load game rom into memory @ $4020-$FFFF?
         memory map (from https://wiki.nesdev.com/w/index.php/CPU_ALL):

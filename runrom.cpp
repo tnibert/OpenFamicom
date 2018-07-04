@@ -23,8 +23,9 @@ int main(int argc, char**argv)
     fclose(f);
 
     // create and init state machine
-    Famicom * nes = new Famicom();
+    Famicom * nes = new Famicom(buffer);
 
+    return 0;
     /* engine to iterate through buffer,
        call opcode->f() for each opcode passed in */
 
