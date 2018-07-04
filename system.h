@@ -11,6 +11,8 @@
 #include <mutex>
 #include <assert.h>
 
+#define PRGROMSTART 0x4020
+
 // class for instructions
 class opcode
 {
@@ -59,7 +61,7 @@ class Famicom {
     public:
         Famicom(unsigned char *);
         std::map<uint8_t, std::shared_ptr<opcode> > opmap;      // can be private
-        int emulate6502op(unsigned char *);
+        int emulate6502op();
         uint16_t getpc();
         Cartridge * cart;
 };

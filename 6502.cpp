@@ -2,9 +2,9 @@
 
 // we will put this into the Famicom class
 // put memory pointer in Famicom class
-int Famicom::emulate6502op(unsigned char * buf)
+int Famicom::emulate6502op()
 {
-    uint8_t opcode = buf[cpu->pc];      // this will need to be read into memory
+    uint8_t opcode = memory[cpu->pc];
 
     opmap[opcode]->f();
 

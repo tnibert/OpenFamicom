@@ -29,10 +29,10 @@ int main(int argc, char**argv)
        call opcode->f() for each opcode passed in */
 
     /* so this is iterating over the prgrom, which I believe contains the instructions... */
-    while (nes->getpc() < nes->cart->prgromsize)
+    while (nes->getpc() < PRGROMSTART+nes->cart->prgromsize)
     {
         //printf("%x : %x\n", nes->getpc(), fsize);
-        nes->emulate6502op(nes->cart->prgrom);
+        nes->emulate6502op();
     }
     printf("\n\n");
     return 0;
