@@ -45,6 +45,14 @@ void opcode::printcode()
     printf("%x\n", code);
 }
 
+void addopcode(std::map<uint8_t, std::shared_ptr<opcode> > * curmap, uint8_t code, const char * inststr)
+{
+    //
+    (*curmap)[code] = std::shared_ptr<opcode>(new opcode(code, inststr));
+}
+
+uint16_t revlendianbytes() {};
+
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Memory * mem)
 {
     std::map<uint8_t, std::shared_ptr<opcode> > opmap;
@@ -53,9 +61,8 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     //std::function<void ()> f = []() { std::cout <<  << std::endl; };
     for(uint8_t i = 0x0; i < 0xff; i++)
     {
-        mycode = std::shared_ptr<opcode>(new opcode(i, "test"));
-        opmap[i] = mycode;
-        opmap[i]->f = [mycode]() { printf("%x-", mycode->code); };
+        addopcode(&opmap, i, "test");
+        opmap[i]->f = [i]() { printf("%x-", i); };
     }
 
     // todo: unit test all opcodes
@@ -64,16 +71,19 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     // LDA $0314 constant
     // absolute address mode
     //delete &opmap[0xad];
-    mycode = std::shared_ptr<opcode>(new opcode(0xad, "lda $"));
-    opmap[0xad] = mycode;
-    opmap[0xad]->f = [cpu, mem, mycode]() {
+    const char * myasm = "lda $";
+    addopcode(&opmap, 0xad, "lda $");
+    opmap[0xad]->f = [cpu, mem, myasm]() {
         /*
-         * I don't think this is quite correct, but we'll work with it
-         * need handle addressing modes I think
+         * ok, so this is absolute addressing, 3 byte instruction
+         * the two bytes after 0xad specify an exact addr to get data to put in A from
+         * need to reverse for little endian
          */
-        cpu->pc += 1;
+        //uint16_t
+
         cpu->a = mem->readmem(cpu->pc);
-        printf("%s%x-", mycode->opcodestr, cpu->a);
+        printf("%s%x-", myasm, cpu->a);
+        cpu->pc += 2;
     };
 
     // dummy because we can't for loop up to 0xff on a uint8_t
