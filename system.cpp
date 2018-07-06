@@ -45,13 +45,28 @@ void opcode::printcode()
     printf("%x\n", code);
 }
 
-void addopcode(std::map<uint8_t, std::shared_ptr<opcode> > * curmap, uint8_t code, const char * inststr)
+const char * addopcode(std::map<uint8_t, std::shared_ptr<opcode> > * curmap, uint8_t code, const char * inststr)
 {
-    //
+    /*
+     * creates a new opcode in the opcode map
+     * returns the string passed in
+     * NOTE: I'm not sure if this method will leak the old contents of memory or not if already assigned...
+     * cursory research suggests no
+     */
     (*curmap)[code] = std::shared_ptr<opcode>(new opcode(code, inststr));
+    return inststr;
 }
 
-uint16_t revlendianbytes() {};
+uint16_t revlendianbytes(uint8_t lsig, uint8_t msig)
+{
+    /*
+     * lsig == lest significant
+     * msig == most significant
+     * In the rom, the least significant bit comes first
+     */
+    uint16_t offset = (msig<<8) | (lsig);
+    return offset;
+}
 
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Memory * mem)
 {
@@ -67,22 +82,23 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
     // todo: unit test all opcodes
 
-    // todo: create a function for the following assignment procedure
     // LDA $0314 constant
     // absolute address mode
     //delete &opmap[0xad];
-    const char * myasm = "lda $";
-    addopcode(&opmap, 0xad, "lda $");
+    const char * myasm = addopcode(&opmap, 0xad, "lda $");
     opmap[0xad]->f = [cpu, mem, myasm]() {
         /*
          * ok, so this is absolute addressing, 3 byte instruction
          * the two bytes after 0xad specify an exact addr to get data to put in A from
          * need to reverse for little endian
+         * todo: implement flags
          */
-        //uint16_t
-
-        cpu->a = mem->readmem(cpu->pc);
-        printf("%s%x-", myasm, cpu->a);
+        printf("\n\n%x",mem->readmem(cpu->pc+1));
+        printf("%x",mem->readmem(cpu->pc+2));
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        printf("\n\n%x\n\n", addr);
+        cpu->a = mem->readmem(addr);
+        printf("%s%x-", myasm, addr);
         cpu->pc += 2;
     };
 

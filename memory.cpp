@@ -1,6 +1,14 @@
 #include "system.h"
 
 /*
+ * This map will need some reworking
+ * loading of prgrom, etc
+ *
+ * so 0000 - 0100 is zero page
+ *    0100 - 0200 is the stack
+ *    0200 - 0800 is the ram,
+ *    then mirrors until 2000, repeating every 600
+ *
     memory map (from https://wiki.nesdev.com/w/index.php/CPU_ALL):
     Address range	Size	Device
     $0000-$07FF	$0800	2KB internal RAM
@@ -37,6 +45,12 @@ void MemoryAccessException(){
 
 }
 
+uint16_t convertmirror(uint16_t addr, int factor)
+{
+    // maybe this deserves its own function to convert mirror addresses, not sure yet
+    return 0;
+}
+
 // todo: create unit tests
 
 void Memory::writemem(uint16_t addr, uint8_t data)
@@ -53,6 +67,12 @@ void Memory::writemem(uint16_t addr, uint8_t data)
     else if(0x800 <= addr && addr < PPUREGSTART)
     {
         // not as beautiful, we are dealing with a mirror address
+        // we mirror every 600 bytes
+        // set should give us which iteration of 600 above 0x800 we are
+        // then addr-(set*600) should convert us to the address under 0x800
+        // this works because int division loses the remainder
+        int set = addr/600;
+        internalram[addr-(set*600)] = data;
     }
     else if(PPUREGSTART <= addr && addr < 0x2008)
     {
@@ -62,6 +82,8 @@ void Memory::writemem(uint16_t addr, uint8_t data)
     else if(0x2008 <= addr && addr < APUIOREGSTART)
     {
         // mirrors of PPU registers
+        int set = 0x2008+(addr/8);
+        internalram[addr-(set*8)] = data;
     }
     else if(APUIOREGSTART <= addr && addr < 0x4018)
     {
@@ -93,6 +115,8 @@ uint8_t Memory::readmem(uint16_t addr)
     else if(0x800 <= addr && addr < PPUREGSTART)
     {
         // not as beautiful, we are dealing with a mirror address
+        int set = addr/600;
+        return internalram[addr-(set*600)];
     }
     else if(PPUREGSTART <= addr && addr < 0x2008)
     {
@@ -101,7 +125,9 @@ uint8_t Memory::readmem(uint16_t addr)
     }
     else if(0x2008 <= addr && addr < APUIOREGSTART)
     {
-        // mirrors of PPU registers
+        // mirrors of PPU registers, repeats every 8 bytes
+        int set = 0x2008+(addr/8);
+        return internalram[addr-(set*8)];
     }
     else if(APUIOREGSTART <= addr && addr < 0x4018)
     {
