@@ -16,6 +16,8 @@
 #define CPUTESTMODESTART 0x4018
 #define PRGROMSTART 0x4020
 
+#define DEBUG 1
+
 // class for instructions
 class opcode
 {
@@ -90,10 +92,14 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *, Memory
 void lda(cpustate *, uint8_t);
 
 // addressing modes
-uint8_t indexedindirect(cpustate *, Memory *);
+uint16_t indexedindirect(cpustate *, Memory *);
 
-uint8_t zeropage(cpustate *, Memory *);
+uint16_t zeropage(cpustate *, Memory *);
 
-uint8_t indirectindexed(cpustate *, Memory *);
+uint16_t zeropagex(cpustate *, Memory *);
+
+uint16_t indirectindexed(cpustate *, Memory *);
+
+uint16_t absolutey(cpustate *, Memory *);
 
 #endif

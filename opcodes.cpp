@@ -53,7 +53,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     opmap[0xa1]->f = [cpu, mem, myasm]() {
         // todo: the readmem method returns a uint8_t, should it return uint16_t?
         printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
-        lda(cpu, indexedindirect(cpu, mem));
+        lda(cpu, mem->readmem(indexedindirect(cpu, mem)));
 
         cpu->pc += 2;
     };
@@ -64,7 +64,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         // todo: UNTESTED
         printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
         // I think passing a uint8_t to a uint16_t should work without issue
-        lda(cpu, zeropage(cpu, mem));
+        lda(cpu, mem->readmem(zeropage(cpu, mem)));
 
         cpu->pc += 2;
     };
@@ -100,10 +100,29 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0xb1, "0xb1 lda ($");
     opmap[0xb1]->f = [cpu, mem, myasm]() {
         printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
-        lda(cpu, indirectindexed(cpu, mem));
+        lda(cpu, mem->readmem(indirectindexed(cpu, mem)));
 
         cpu->pc += 2;
     };
+
+    // LDA zero page,X
+    myasm = addopcode(&opmap, 0xb5, "0xb5 lda $");
+    opmap[0xb5]->f = [cpu, mem, myasm]() {
+        printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
+        lda(cpu, mem->readmem(zeropagex(cpu, mem)));
+
+        cpu->pc += 2;
+    };
+
+    // LDA absolute,Y
+    myasm = addopcode(&opmap, 0xb9, "0xb9 lda $");
+    opmap[0xb9]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
+        lda(cpu, mem->readmem(absolutey(cpu, mem)));
+        cpu->pc += 3;
+    };
+
+    // 0xbd LDA absolute,X
 
     // dummy because we can't for loop up to 0xff on a uint8_t
     myasm = addopcode(&opmap, 0xff, "DNE");
