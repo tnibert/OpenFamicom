@@ -52,8 +52,9 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0xa1, "0xa1 lda ($");
     opmap[0xa1]->f = [cpu, mem, myasm]() {
         // todo: the readmem method returns a uint8_t, should it return uint16_t?
-        printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
-        uint16_t addr = (mem->readmem(cpu->pc+1)) + cpu->x;
+        uint8_t zpageaddr = mem->readmem(cpu->pc+1);
+        printf("\n%s%x,X)\n", myasm, zpageaddr);
+        uint16_t addr = zpageaddr + cpu->x;
         // we have to read from addr to find the new addr to load from?
         addr = revlendianbytes(mem->readmem(addr), mem->readmem(addr+1));
         lda(cpu, mem->readmem(addr));
@@ -97,6 +98,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         printf("\n%s%x\n", myasm, addr);
 
         cpu->pc += 3;
+    };
+
+    // LDA indirect indexed
+    myasm = addopcode(&opmap, 0xb1, "0xb1 lda ($");
+    opmap[0xb1]->f = [cpu, mem, myasm]() {
+        uint8_t zpageaddr = mem->readmem(cpu->pc+1);
+        printf("\n%s%x),Y\n", myasm, zpageaddr);
+        uint16_t addr = (revlendianbytes(mem->readmem(zpageaddr), mem->readmem(zpageaddr+1))) + cpu->y;
+        lda(cpu, mem->readmem(addr));
+
+        cpu->pc += 2;
     };
 
     // dummy because we can't for loop up to 0xff on a uint8_t
