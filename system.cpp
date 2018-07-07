@@ -4,10 +4,6 @@
 #include <string>
 #include <map>
 #include <functional>
-/*#include <memory>
-#include <thread>
-#include <chrono>
-#include <mutex>*/
 
 Famicom::Famicom(unsigned char * rom) {
     using namespace std;
@@ -20,7 +16,7 @@ Famicom::Famicom(unsigned char * rom) {
     cpu->a = 0;
     cpu->x = 0;
     cpu->y = 0;
-    cpu->p = 0x34;
+    cpu->p = 0x34;      // processor status flags
     cpu->sp = 0xfd;
 
     // initialize cartridge
@@ -91,14 +87,49 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
          * ok, so this is absolute addressing, 3 byte instruction
          * the two bytes after 0xad specify an exact addr to get data to put in A from
          * need to reverse for little endian
-         * todo: implement flags
          */
-        printf("\n\n%x",mem->readmem(cpu->pc+1));
-        printf("%x",mem->readmem(cpu->pc+2));
+
         uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
-        printf("\n\n%x\n\n", addr);
         cpu->a = mem->readmem(addr);
-        printf("%s%x-", myasm, addr);
+        printf("\n%s%x\n-", myasm, addr);
+
+        // set flags, these are common to all LDA instructions I think
+        // to set bits we use bitwise OR
+        // todo: verify that flag implementation is correct
+        /*
+         * LDA affects the contents of the accumulator, does not affect
+            the carry or overflow flags; sets the zero flag if the accumulator
+            is zero as a result of the LDA, otherwise resets the zero flag;
+            sets the negative flag if bit 7 of the accumulator is a 1, other­
+            wise resets the negative flag.
+            - is that bit 7 starting at 0 or 1?
+         */
+        // zero flag
+        if(!cpu->a)
+        {
+            // set 0 flag
+            // to do this we OR because Y OR 1 == 1, and Y OR 0 == 0
+            cpu->p |= 0b00000010;
+        }
+        else
+        {
+            // reset 0 flag off
+            // to do this we AND because Y AND 1 == Y
+            cpu->p &= 0b11111101;
+        }
+
+        // negative flag
+        // I'm going to assume we are setting bit 7 based on a start bit of 0
+        // that seems to make most sense for a sign bit
+        if(cpu->a & 0b10000000)           // on
+        {
+            cpu->p |= 0b10000000;
+        }
+        else            // off
+        {
+            cpu->p &= 0b01111111;
+        }
+
         cpu->pc += 2;
     };
 
