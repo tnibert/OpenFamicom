@@ -26,7 +26,8 @@ const char * addopcode(std::map<uint8_t, std::shared_ptr<opcode> > * curmap, uin
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Memory * mem)
 {
     std::map<uint8_t, std::shared_ptr<opcode> > opmap;
-    std::shared_ptr<opcode> mycode;
+    const char * myasm;
+
     // now we need to do this for all opcodes
     //std::function<void ()> f = []() { std::cout <<  << std::endl; };
     for(uint8_t i = 0x0; i < 0xff; i++)
@@ -36,11 +37,19 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     }
 
     // todo: unit test all opcodes
+    // http://www.emulator101.com/reference/6502-reference.html
+
+    // BRK
+    myasm = addopcode(&opmap, 0x00, "BRK");
+    opmap[0x00]->f = [cpu, myasm]() {
+        printf("\n%s\n", myasm);
+        cpu->pc += 1;
+    };
 
     // LDA $0314 constant
     // absolute address mode
     //delete &opmap[0xad];
-    const char * myasm = addopcode(&opmap, 0xad, "lda $");
+    myasm = addopcode(&opmap, 0xad, "lda $");
     opmap[0xad]->f = [cpu, mem, myasm]() {
         /*
          * ok, so this is absolute addressing, 3 byte instruction
@@ -50,15 +59,14 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
         lda(cpu, mem->readmem(addr));
-        printf("\n%s%x\n-", myasm, addr);
+        printf("\n%s%x\n", myasm, addr);
 
         cpu->pc += 2;
     };
 
     // dummy because we can't for loop up to 0xff on a uint8_t
-    mycode = std::shared_ptr<opcode>(new opcode(0xff, "test"));
-    opmap[0xff] = mycode;
-    opmap[0xff]->f = [mycode]() { printf("%x-", mycode->code); };
+    myasm = addopcode(&opmap, 0xff, "DNE");
+    opmap[0xff]->f = []() { printf("\n0xff DNE\n"); };
 
     return opmap;
 }

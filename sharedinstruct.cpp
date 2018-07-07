@@ -12,6 +12,8 @@
  * These functions will not increase the program counter as the instruction size may vary
  */
 
+// todo: unit test all of this
+
 void lda(cpustate * cpu, uint8_t data)
 {
     cpu->a = data;
@@ -52,4 +54,44 @@ void lda(cpustate * cpu, uint8_t data)
     {
         cpu->p &= 0b01111111;
     }
+}
+
+void sta(cpustate * cpu, Memory * mem, uint16_t addr)
+{
+    /*
+     * This instruction transfers the contents of the accumulator to
+        memory.
+        The symbolic representation for this instruction is A -> M.
+        This instruction affects none of the flags in the processor
+        status register and does not affect the accumulator.
+        It is a "Group One" instruction and has the following address­
+        ing modes available to it:
+        Absolute; Zero Page; Absolute,X; Absolute,Y; Zero Page,X;
+        Indexed Indirect; and Indirect Indexed.
+     */
+    mem->writemem(addr, cpu->a);
+}
+
+void adc()
+{
+    /*
+     * Group 1 instruction
+     * NES processor doesn't use binary coded decimal, thank god
+     * This instruction adds the value of memory and carry from the
+        previous operation to the value of the accumulator and stores the
+        result: in the accumulator.
+        The symbolic representation for this instruction is
+        A + M + C -> A.
+        This instruction affects the accumulator; sets the carry flag
+        when the sum of a binary add exceeds 255 or when the sum of a decimal
+        add exceeds 99, otherwise carry is reset.
+        The overflow flag is set
+        when the sign or bit 7 is changed due to the result exceeding +127
+        or -128, otherwise overflow is reset.
+        The negative flag is set if
+        the accumulator result contains bit 7 on, otherwise the negative
+        flag is reset.
+        The zero flag is set if the accumulator result is 0,
+        otherwise the zero flag is reset.
+     */
 }
