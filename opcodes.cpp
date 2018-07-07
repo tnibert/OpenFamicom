@@ -40,7 +40,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     // http://www.emulator101.com/reference/6502-reference.html
 
     // BRK
-    myasm = addopcode(&opmap, 0x00, "BRK");
+    myasm = addopcode(&opmap, 0x00, "0x00 BRK");
     opmap[0x00]->f = [cpu, myasm]() {
         printf("\n%s\n", myasm);
         cpu->pc += 1;
@@ -49,11 +49,11 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     // LDA
     // indexed indirect address mode - slightly convoluted
     // http://www.emulator101.com/6502-addressing-modes.html
-    myasm = addopcode(&opmap, 0xa1, "lda ($");
+    myasm = addopcode(&opmap, 0xa1, "0xa1 lda ($");
     opmap[0xa1]->f = [cpu, mem, myasm]() {
         // todo: the readmem method returns a uint8_t, should it return uint16_t?
-        uint16_t addr = (cpu->pc+1) + cpu->x;
-        printf("\n%s%x,X)\n", myasm, addr);
+        printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
+        uint16_t addr = (mem->readmem(cpu->pc+1)) + cpu->x;
         // we have to read from addr to find the new addr to load from?
         addr = revlendianbytes(mem->readmem(addr), mem->readmem(addr+1));
         lda(cpu, mem->readmem(addr));
@@ -61,9 +61,30 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 2;
     };
 
+    // LDA zero page
+    myasm = addopcode(&opmap, 0xa5, "0xa5 lda $");
+    opmap[0xa5]->f = [cpu, mem, myasm]() {
+        // todo: UNTESTED
+        printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        // I think passing a uint8_t to a uint16_t should work without issue
+        lda(cpu, mem->readmem(mem->readmem(cpu->pc+1)));
+
+        cpu->pc += 2;
+    };
+
+    // LDA immediate
+    myasm = addopcode(&opmap, 0xa9, "0xa9 lda #$");
+    opmap[0xa9]->f = [cpu, mem, myasm]() {
+        uint8_t val = mem->readmem(cpu->pc+1);
+        printf("\n%s%x\n", myasm, val);
+        lda(cpu, val);
+
+        cpu->pc += 2;
+    };
+
     // LDA $0314 constant
     // absolute address mode
-    myasm = addopcode(&opmap, 0xad, "lda $");
+    myasm = addopcode(&opmap, 0xad, "0xad lda $");
     opmap[0xad]->f = [cpu, mem, myasm]() {
         /*
          * ok, so this is absolute addressing, 3 byte instruction
@@ -84,4 +105,3 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
     return opmap;
 }
-
