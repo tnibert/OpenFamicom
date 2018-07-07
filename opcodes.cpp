@@ -52,12 +52,8 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0xa1, "0xa1 lda ($");
     opmap[0xa1]->f = [cpu, mem, myasm]() {
         // todo: the readmem method returns a uint8_t, should it return uint16_t?
-        uint8_t zpageaddr = mem->readmem(cpu->pc+1);
-        printf("\n%s%x,X)\n", myasm, zpageaddr);
-        uint16_t addr = zpageaddr + cpu->x;
-        // we have to read from addr to find the new addr to load from?
-        addr = revlendianbytes(mem->readmem(addr), mem->readmem(addr+1));
-        lda(cpu, mem->readmem(addr));
+        printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
+        lda(cpu, indexedindirect(cpu, mem));
 
         cpu->pc += 2;
     };
@@ -68,7 +64,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         // todo: UNTESTED
         printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
         // I think passing a uint8_t to a uint16_t should work without issue
-        lda(cpu, mem->readmem(mem->readmem(cpu->pc+1)));
+        lda(cpu, zeropage(cpu, mem));
 
         cpu->pc += 2;
     };
@@ -103,10 +99,8 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     // LDA indirect indexed
     myasm = addopcode(&opmap, 0xb1, "0xb1 lda ($");
     opmap[0xb1]->f = [cpu, mem, myasm]() {
-        uint8_t zpageaddr = mem->readmem(cpu->pc+1);
-        printf("\n%s%x),Y\n", myasm, zpageaddr);
-        uint16_t addr = (revlendianbytes(mem->readmem(zpageaddr), mem->readmem(zpageaddr+1))) + cpu->y;
-        lda(cpu, mem->readmem(addr));
+        printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
+        lda(cpu, indirectindexed(cpu, mem));
 
         cpu->pc += 2;
     };

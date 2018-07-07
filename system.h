@@ -89,4 +89,11 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *, Memory
 // common asm operations
 void lda(cpustate *, uint8_t);
 
+// addressing modes
+uint8_t indexedindirect(cpustate *, Memory *);
+
+uint8_t zeropage(cpustate *, Memory *);
+
+uint8_t indirectindexed(cpustate *, Memory *);
+
 #endif
