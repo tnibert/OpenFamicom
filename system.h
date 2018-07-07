@@ -86,4 +86,7 @@ uint16_t revlendianbytes(uint8_t, uint8_t);
 
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *, Memory *);
 
+// common asm operations
+void lda(cpustate *, uint8_t);
+
 #endif
