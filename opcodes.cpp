@@ -46,9 +46,23 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 1;
     };
 
+    // LDA
+    // indexed indirect address mode - slightly convoluted
+    // http://www.emulator101.com/6502-addressing-modes.html
+    myasm = addopcode(&opmap, 0xa1, "lda ($");
+    opmap[0xa1]->f = [cpu, mem, myasm]() {
+        // todo: the readmem method returns a uint8_t, should it return uint16_t?
+        uint16_t addr = (cpu->pc+1) + cpu->x;
+        printf("\n%s%x,X)\n", myasm, addr);
+        // we have to read from addr to find the new addr to load from?
+        addr = revlendianbytes(mem->readmem(addr), mem->readmem(addr+1));
+        lda(cpu, mem->readmem(addr));
+
+        cpu->pc += 2;
+    };
+
     // LDA $0314 constant
     // absolute address mode
-    //delete &opmap[0xad];
     myasm = addopcode(&opmap, 0xad, "lda $");
     opmap[0xad]->f = [cpu, mem, myasm]() {
         /*
@@ -61,7 +75,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         lda(cpu, mem->readmem(addr));
         printf("\n%s%x\n", myasm, addr);
 
-        cpu->pc += 2;
+        cpu->pc += 3;
     };
 
     // dummy because we can't for loop up to 0xff on a uint8_t

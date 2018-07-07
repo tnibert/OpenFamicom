@@ -56,6 +56,11 @@ void lda(cpustate * cpu, uint8_t data)
     }
 }
 
+void ldflags(cpustate * cpu)
+{
+    // confirm whether or not lda, ldx, and ldy set flags the same way
+}
+
 void sta(cpustate * cpu, Memory * mem, uint16_t addr)
 {
     /*
