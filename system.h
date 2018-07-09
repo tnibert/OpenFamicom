@@ -14,6 +14,9 @@
 #define PPUREGSTART 0x2000
 #define APUIOREGSTART 0x4000
 #define CPUTESTMODESTART 0x4018
+
+// todo: this is not entirely correct, prgrom map is more complex
+// need to implement correctly
 #define PRGROMSTART 0x4020
 
 #define DEBUG 1
@@ -39,6 +42,16 @@ typedef struct cpustate {
     uint16_t pc;
 } cpustate;
 
+class PPU
+{
+    /* Picture Processing Unit
+     * currently this is slated to be implemented quite differently to CPU
+     * whether that is sufficient is tbd
+     * it would be nice to have an abstract class for processing units
+     * as we will need to implement the APU later as well
+     */
+};
+
 class Cartridge {
     /* class to manage .nes files */
     // https://wiki.nesdev.com/w/index.php/INES
@@ -58,6 +71,8 @@ class Cartridge {
         Cartridge(unsigned char *);
 };
 
+// todo: create abstract class for memory implementations - PPU vram + system memory
+
 class Memory
 {
     uint8_t * internalram;
@@ -71,6 +86,11 @@ class Memory
         // the following are for reading and writing memory, uint16_t is the address
         void writemem(uint16_t, uint8_t);
         uint8_t readmem(uint16_t);
+};
+
+class Vram
+{
+
 };
 
 class Famicom {
