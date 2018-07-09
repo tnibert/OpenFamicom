@@ -102,4 +102,6 @@ uint16_t indirectindexed(cpustate *, Memory *);
 
 uint16_t absolutey(cpustate *, Memory *);
 
+uint16_t absolutex(cpustate *, Memory *);
+
 #endif

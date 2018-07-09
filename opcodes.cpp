@@ -43,6 +43,9 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0x00, "0x00 BRK");
     opmap[0x00]->f = [cpu, myasm]() {
         printf("\n%s\n", myasm);
+
+        // todo: this actually does something important, implement
+
         cpu->pc += 1;
     };
 
@@ -123,6 +126,12 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     };
 
     // 0xbd LDA absolute,X
+    myasm = addopcode(&opmap, 0xbd, "0xbd lda $");
+    opmap[0xbd]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        lda(cpu, mem->readmem(absolutex(cpu, mem)));
+        cpu->pc += 3;
+    };
 
     // dummy because we can't for loop up to 0xff on a uint8_t
     myasm = addopcode(&opmap, 0xff, "DNE");

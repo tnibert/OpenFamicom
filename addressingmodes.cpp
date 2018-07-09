@@ -42,3 +42,10 @@ uint16_t absolutey(cpustate * cpu, Memory * mem)
     addr += cpu->y;
     return addr;
 }
+
+uint16_t absolutex(cpustate * cpu, Memory * mem)
+{
+    uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2));
+    addr += cpu->x;
+    return addr;
+}
