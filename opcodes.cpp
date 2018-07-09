@@ -113,7 +113,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 3;
     };
 
-    // STA zero page,y??? does it exist?
+    // STA zero page,y??? does it exist? nope
 
     // LDA
     // indexed indirect address mode - slightly convoluted

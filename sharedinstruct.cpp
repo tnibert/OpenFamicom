@@ -77,8 +77,10 @@ void sta(cpustate * cpu, Memory * mem, uint16_t addr)
     mem->writemem(addr, cpu->a);
 }
 
-void adc()
+void adc(cpustate * cpu, uint8_t arg)
 {
+    // todo: I'm not hanging with the math here so I definitely need to unit test and get my head into it
+    // remember the cardinal rule: whatever is not understood will be the cause of bugs
     /*
      * Group 1 instruction
      * NES processor doesn't use binary coded decimal, thank god
@@ -98,5 +100,68 @@ void adc()
         flag is reset.
         The zero flag is set if the accumulator result is 0,
         otherwise the zero flag is reset.
+
+        implementation:
+        from https://stackoverflow.com/a/29224684
+        need to understand it...
+
+        flags:
+        CZ- - - VN
+        V is oVerflow flag
+
+        http://www.learncpp.com/cpp-tutorial/3-8a-bit-flags-and-bit-masks/
      */
+    bool carry = cpu->p & (1 << 7);
+
+    unsigned const sum = cpu->a + arg + carry;
+
+    // carry flag test
+    if(sum > 0xFF)
+    {
+        // set carry
+        cpu->p |= (1 << 7);
+    }
+    else {
+        // clear carry
+        cpu->p &= ~(1 << 7);
+    }
+
+    // The overflow flag is set when the sign of the addends is the same and
+    // differs from the sign of the sum
+    // 0x80 is hex for 0b10000000
+    // ^ is bitwise xor operator
+    if(~(cpu->a ^ arg) & (cpu->a ^ sum) & 0x80)
+    {
+        // set overflow flag
+        cpu->p |= (1 << 1);
+    }
+    else
+    {
+        // clear overflow flag
+        cpu->p &= ~(1 << 1);
+    }
+
+    // I think the front bits will just fall off if we overflow the uint8_t??
+    cpu->a = sum;
+
+    // if bit 7 of accumulator is on, negative flag is set
+    if(cpu->a & 0x80)
+    {
+        cpu->p |= 1;
+    }
+    else
+    {
+        cpu->p &= ~1;
+    }
+    // if accumulator is 0, zero flag is set
+    if(!cpu->a)
+    {
+        cpu->p |= (1 << 6);
+    }
+    else
+    {
+        cpu->p &= ~(1 << 6);
+    }
 }
+
+void sbc(cpustate * cpu, uint8_t arg) { adc(cpu, ~arg); }
