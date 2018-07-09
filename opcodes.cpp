@@ -49,13 +49,79 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 1;
     };
 
+    // STA indexed indirect
+    myasm = addopcode(&opmap, 0x81, "0x81 sta ($");
+    opmap[0x81]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
+        sta(cpu, mem, indexedindirect(cpu, mem));
+
+        cpu->pc += 2;
+    };
+
+    // STA zero page
+    myasm = addopcode(&opmap, 0x85, "0x85 sta $");
+    opmap[0x85]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        sta(cpu, mem, mem->readmem(zeropage(cpu, mem)));
+
+        cpu->pc += 2;
+    };
+
+    // STA absolute
+    myasm = addopcode(&opmap, 0x8d, "0x8d sta $");
+    opmap[0x8d]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        sta(cpu, mem, mem->readmem(addr));
+
+        cpu->pc += 3;
+    };
+
+    // STA indirect indexed
+    myasm = addopcode(&opmap, 0x91, "0x91 sta ($");
+    opmap[0x91]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
+        sta(cpu, mem, mem->readmem(indirectindexed(cpu, mem)));
+
+        cpu->pc += 2;
+    };
+
+    // STA zero page,x
+    myasm = addopcode(&opmap, 0x95, "0x95 sta $");
+    opmap[0x95]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
+        sta(cpu, mem, mem->readmem(zeropagex(cpu, mem)));
+
+        cpu->pc += 2;
+    };
+
+    // STA absolute,y
+    myasm = addopcode(&opmap, 0x99, "0x99 sta $");
+    opmap[0x99]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
+        sta(cpu, mem, mem->readmem(absolutey(cpu, mem)));
+
+        cpu->pc += 3;
+    };
+
+    // STA absolute,x
+    myasm = addopcode(&opmap, 0x9d, "0x9d sta $");
+    opmap[0x9d]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        sta(cpu, mem, mem->readmem(absolutex(cpu, mem)));
+
+        cpu->pc += 3;
+    };
+
+    // STA zero page,y??? does it exist?
+
     // LDA
     // indexed indirect address mode - slightly convoluted
     // http://www.emulator101.com/6502-addressing-modes.html
     myasm = addopcode(&opmap, 0xa1, "0xa1 lda ($");
     opmap[0xa1]->f = [cpu, mem, myasm]() {
         // todo: the readmem method returns a uint8_t, should it return uint16_t?
-        printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
+        if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
         lda(cpu, mem->readmem(indexedindirect(cpu, mem)));
 
         cpu->pc += 2;
@@ -65,7 +131,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0xa5, "0xa5 lda $");
     opmap[0xa5]->f = [cpu, mem, myasm]() {
         // todo: UNTESTED
-        printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        if(DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
         // I think passing a uint8_t to a uint16_t should work without issue
         lda(cpu, mem->readmem(zeropage(cpu, mem)));
 
@@ -76,7 +142,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0xa9, "0xa9 lda #$");
     opmap[0xa9]->f = [cpu, mem, myasm]() {
         uint8_t val = mem->readmem(cpu->pc+1);
-        printf("\n%s%x\n", myasm, val);
+        if(DEBUG) printf("\n%s%x\n", myasm, val);
         lda(cpu, val);
 
         cpu->pc += 2;
@@ -94,7 +160,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
         lda(cpu, mem->readmem(addr));
-        printf("\n%s%x\n", myasm, addr);
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
 
         cpu->pc += 3;
     };
@@ -102,7 +168,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     // LDA indirect indexed
     myasm = addopcode(&opmap, 0xb1, "0xb1 lda ($");
     opmap[0xb1]->f = [cpu, mem, myasm]() {
-        printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
+        if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
         lda(cpu, mem->readmem(indirectindexed(cpu, mem)));
 
         cpu->pc += 2;
@@ -111,7 +177,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     // LDA zero page,X
     myasm = addopcode(&opmap, 0xb5, "0xb5 lda $");
     opmap[0xb5]->f = [cpu, mem, myasm]() {
-        printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
+        if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
         lda(cpu, mem->readmem(zeropagex(cpu, mem)));
 
         cpu->pc += 2;
