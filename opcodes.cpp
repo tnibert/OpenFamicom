@@ -49,6 +49,45 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 1;
     };
 
+    // ADC indexed indirect
+    myasm = addopcode(&opmap, 0x61, "0x61 adc ($");
+    opmap[0x61]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
+        adc(cpu, indexedindirect(cpu, mem));
+
+        cpu->pc += 2;
+    };
+
+    // ADC zero page
+    myasm = addopcode(&opmap, 0x65, "0x65 adc $");
+    opmap[0x65]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        adc(cpu, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+    };
+
+    // ADC immediate
+    myasm = addopcode(&opmap, 0x69, "0x69 adc #$");
+    opmap[0x69]->f = [cpu, mem, myasm]() {
+        uint8_t val = mem->readmem(cpu->pc+1);
+        if (DEBUG) printf("\n%s%x\n", myasm, val);
+        adc(cpu, val);
+
+        cpu->pc += 2;
+    };
+
+    // ADC absolute $6d
+
+    // ADC indirect indexed $71
+
+    // ADC zero page,x $75
+
+    // ADC absolute,y $79
+
+    // ADC absolute,x $7d
+
+
     // STA indexed indirect
     myasm = addopcode(&opmap, 0x81, "0x81 sta ($");
     opmap[0x81]->f = [cpu, mem, myasm]() {
