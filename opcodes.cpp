@@ -58,6 +58,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 7;
     };
 
+    // CLC 0x18
+    myasm = addopcode(&opmap, 0x18, "0x18 clc");
+    opmap[0x18]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+
+        // clear carry
+        cpu->p &= ~(1 << 7);
+
+        cpu->pc += 1;
+        return 2;
+    };
+
     // ADC indexed indirect
     myasm = addopcode(&opmap, 0x61, "0x61 adc ($");
     opmap[0x61]->f = [cpu, mem, myasm]() {
