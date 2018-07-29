@@ -111,6 +111,8 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *, Memory
 // common asm operations
 void lda(cpustate *, uint8_t);
 void sta(cpustate *, Memory *, uint16_t);
+void stx(cpustate *, Memory *, uint16_t);
+void sty(cpustate *, Memory *, uint16_t);
 void adc(cpustate *, uint8_t);
 void sbc(cpustate *, uint8_t);
 

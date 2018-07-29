@@ -70,6 +70,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 2;
     };
 
+    // SEC 0x38
+    myasm = addopcode(&opmap, 0x38, "0x38 sec");
+    opmap[0x38]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+
+        // set carry
+        cpu->p |= (1 << 7);
+
+        cpu->pc += 1;
+        return 2;
+    };
+
     // CLI 0x58
     myasm = addopcode(&opmap, 0x58, "0x58 cli");
     opmap[0x58]->f = [cpu, myasm]() {

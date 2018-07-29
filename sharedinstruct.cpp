@@ -81,6 +81,18 @@ void sta(cpustate * cpu, Memory * mem, uint16_t addr)
     mem->writemem(addr, cpu->a);
 }
 
+void stx(cpustate * cpu, Memory * mem, uint16_t addr)
+{
+    // transfers contents of x register to memory
+    mem->writemem(addr, cpu->x);
+}
+
+void sty(cpustate * cpu, Memory * mem, uint16_t addr)
+{
+    // transfers contents of y register to memory
+    mem->writemem(addr, cpu->y);
+}
+
 void adc(cpustate * cpu, uint8_t arg)
 {
     // todo: I'm not hanging with the math here so I definitely need to unit test and get my head into it
