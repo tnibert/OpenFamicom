@@ -51,6 +51,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         printf("\n%s\n", myasm);
 
         // todo: this actually does something important, implement
+        // forces the generation of an interrupt request
 
         return 1;
     };

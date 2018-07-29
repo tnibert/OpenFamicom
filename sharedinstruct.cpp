@@ -10,6 +10,10 @@
  *
  * This will probably mostly be for handling flags
  * These functions will not increase the program counter as the instruction size may vary
+ *
+ * If an instruction has only one opcode, it will be implemented in opcodes.cpp
+ *
+ * http://obelisk.me.uk/6502/reference.html
  */
 
 // todo: unit test all of this
@@ -169,6 +173,24 @@ void OR()
 }
 
 void EOR()
+{
+
+}
+
+// Arithmetic Shift Left
+void asl()
+{
+
+}
+
+// Logical Shift Right
+void lsr()
+{
+
+}
+
+// Rotate Right
+void ror()
 {
 
 }

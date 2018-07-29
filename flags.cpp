@@ -1,5 +1,9 @@
 #include "system.h"
 
+/*
+ * setter functions return true or false based on whether flag was set or not
+ */
+
 bool setzeroflag(cpustate * cpu)
 {
     // if accumulator is 0, zero flag is set
