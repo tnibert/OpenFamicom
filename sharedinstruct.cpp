@@ -144,24 +144,31 @@ void adc(cpustate * cpu, uint8_t arg)
     // I think the front bits will just fall off if we overflow the uint8_t??
     cpu->a = sum;
 
-    // if bit 7 of accumulator is on, negative flag is set
-    if(cpu->a & 0x80)
-    {
-        cpu->p |= 1;
-    }
-    else
-    {
-        cpu->p &= ~1;
-    }
-    // if accumulator is 0, zero flag is set
-    if(!cpu->a)
-    {
-        cpu->p |= (1 << 6);
-    }
-    else
-    {
-        cpu->p &= ~(1 << 6);
-    }
+    setnegflag(cpu);
+    setzeroflag(cpu);
 }
 
 void sbc(cpustate * cpu, uint8_t arg) { adc(cpu, ~arg); }
+
+void AND(cpustate * cpu, uint8_t arg)
+{
+    /*
+    AND is a "Group One" instruction having addressing modes of
+    Immediate; Absolute; Zero Page; Absolute,X; Absolute,Y; Zero Page,X;
+    Indexed Indirect; and Indirect Indexed.
+     */
+    cpu->a = cpu->a & arg;
+
+    setzeroflag(cpu);
+    setnegflag(cpu);
+}
+
+void OR()
+{
+
+}
+
+void EOR()
+{
+
+}

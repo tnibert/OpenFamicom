@@ -127,4 +127,8 @@ uint16_t absolutey(cpustate *, Memory *);
 
 uint16_t absolutex(cpustate *, Memory *);
 
+// flag setting (flags.cpp)
+bool setzeroflag(cpustate *);
+bool setnegflag(cpustate *);
+
 #endif
