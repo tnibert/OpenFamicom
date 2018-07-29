@@ -33,7 +33,10 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     for(uint8_t i = 0x0; i < 0xff; i++)
     {
         addopcode(&opmap, i, "test");
-        opmap[i]->f = [i]() { printf("%x-", i); };
+        opmap[i]->f = [i, cpu]() {
+            cpu->pc++;
+            printf("%x-", i);
+        };
     }
 
     // todo: unit test all opcodes
@@ -275,7 +278,82 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
     // dummy because we can't for loop up to 0xff on a uint8_t
     myasm = addopcode(&opmap, 0xff, "DNE");
-    opmap[0xff]->f = []() { printf("\n0xff DNE\n"); };
+    opmap[0xff]->f = [cpu]() { printf("\n0xff DNE\n"); cpu->pc++; };
 
+    /*
+    SBC #$NN	Immediate	$e9	CZ- - - VN
+    SBC $NNNN	Absolute	$ed	CZ- - - VN
+    SBC $NNNN,X	Absolute,X	$fd	CZ- - - VN
+    SBC $NNNN,Y	Absolute,Y	$f9	CZ- - - VN
+    SBC $NN	Zero Page	$e5	CZ- - - VN
+    SBC $NN,X	Zero Page,X	$f5	CZ- - - VN
+    SBC ($NN,X)	Indexed Indirect	$e1	CZ- - - VN
+    SBC ($NN),Y	Indirect Indexed	$f1	CZ- - - VN
+     */
+    // SBC zero page
+    myasm = addopcode(&opmap, 0xe5, "0xe5 sbc $");
+    opmap[0xe5]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        sbc(cpu, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+    };
+
+    // SBC immediate
+    myasm = addopcode(&opmap, 0xe9, "0xe9 sbc #$");
+    opmap[0xe9]->f = [cpu, mem, myasm]() {
+        uint8_t val = mem->readmem(cpu->pc+1);
+        if (DEBUG) printf("\n%s%x\n", myasm, val);
+        sbc(cpu, val);
+
+        cpu->pc += 2;
+    };
+
+    // SBC absolute $ed
+    myasm = addopcode(&opmap, 0xed, "0xed sbc $");
+    opmap[0xed]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        adc(cpu, mem->readmem(addr));
+
+        cpu->pc += 3;
+    };
+/*
+    // ADC indirect indexed $71
+    myasm = addopcode(&opmap, 0x71, "0x71 adc ($");
+    opmap[0x71]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
+        adc(cpu, mem->readmem(indirectindexed(cpu, mem)));
+
+        cpu->pc += 2;
+    };
+
+    // ADC zero page,x $75
+    myasm = addopcode(&opmap, 0x75, "0x75 adc $");
+    opmap[0x75]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
+        adc(cpu, mem->readmem(zeropagex(cpu, mem)));
+
+        cpu->pc += 2;
+    };
+
+    // ADC absolute,y $79
+    myasm = addopcode(&opmap, 0x79, "0x79 adc $");
+    opmap[0x79]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
+        adc(cpu, mem->readmem(absolutey(cpu, mem)));
+
+        cpu->pc += 3;
+    };
+
+    // ADC absolute,x $7d
+    myasm = addopcode(&opmap, 0x7d, "0x7d adc $");
+    opmap[0x7d]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        adc(cpu, mem->readmem(absolutex(cpu, mem)));
+
+        cpu->pc += 3;
+    };
+*/
     return opmap;
 }

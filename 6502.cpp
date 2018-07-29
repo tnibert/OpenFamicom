@@ -8,7 +8,7 @@ int Famicom::emulate6502op()
 
     opmap[opcode]->f();
 
-    cpu->pc++;          // next instruction
+    // we won't increment the pc here because that will be done in the opcode function
 
     return 0;
 }
