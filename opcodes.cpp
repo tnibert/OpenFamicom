@@ -25,6 +25,8 @@ const char * addopcode(std::map<uint8_t, std::shared_ptr<opcode> > * curmap, uin
 
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Memory * mem)
 {
+    // http://obelisk.me.uk/6502/reference.html
+
     std::map<uint8_t, std::shared_ptr<opcode> > opmap;
     const char * myasm;
 
@@ -211,12 +213,33 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
+    // STX zero page 0x86
+    myasm = addopcode(&opmap, 0x86, "0x86 stx $");
+    opmap[0x86]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        stx(cpu, mem, mem->readmem(zeropage(cpu, mem)));
+
+        cpu->pc += 2;
+        return 3;
+    };
+
     // STA absolute
     myasm = addopcode(&opmap, 0x8d, "0x8d sta $");
     opmap[0x8d]->f = [cpu, mem, myasm]() {
         uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
         if(DEBUG) printf("\n%s%x\n", myasm, addr);
         sta(cpu, mem, mem->readmem(addr));
+
+        cpu->pc += 3;
+        return 4;
+    };
+
+    // STX absolute 0x8e
+    myasm = addopcode(&opmap, 0x8e, "0x8e stx $");
+    opmap[0x8e]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        stx(cpu, mem, mem->readmem(addr));
 
         cpu->pc += 3;
         return 4;
@@ -237,6 +260,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     opmap[0x95]->f = [cpu, mem, myasm]() {
         if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
         sta(cpu, mem, mem->readmem(zeropagex(cpu, mem)));
+
+        cpu->pc += 2;
+        return 4;
+    };
+
+    // STX zero page,y 0x96
+    myasm = addopcode(&opmap, 0x96, "0x96 stx ZEROPAGE,Y TO IMPLEMENT");
+    // todo: implement zeropage,y addressing
+    opmap[0x96]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s\n", myasm);    //printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
+        //stx(cpu, mem, mem->readmem(zeropagey(cpu, mem)));
 
         cpu->pc += 2;
         return 4;
