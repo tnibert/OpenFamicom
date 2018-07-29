@@ -6,9 +6,15 @@ int Famicom::emulate6502op()
 {
     uint8_t opcode = memory->readmem(cpu->pc);
 
-    opmap[opcode]->f();
+    int cycles = opmap[opcode]->f();
 
-    // we won't increment the pc here because that will be done in the opcode function
+    cpu->pc += cycles;
+
+    // synchronize ppu
+    for(int i = 0; i < cycles; i++)
+    {
+        // execute ppu cycles
+    }
 
     return 0;
 }

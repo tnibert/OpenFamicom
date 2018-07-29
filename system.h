@@ -29,7 +29,7 @@ class opcode
         void printcode();
         const char * opcodestr;
         uint8_t code;                           // may want to write an accessor
-        std::function<void ()> f;               // this doesn't seem to have access to the variables for the opcode object
+        std::function<int ()> f;               // this returns the number of clock cycles
 };
 
 typedef struct cpustate {

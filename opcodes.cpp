@@ -34,13 +34,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     {
         addopcode(&opmap, i, "test");
         opmap[i]->f = [i, cpu]() {
-            cpu->pc++;
             printf("%x-", i);
+
+            return 1;
         };
     }
 
     // todo: unit test all opcodes
     // http://www.emulator101.com/reference/6502-reference.html
+
+    // note: all opcode functions return number of cpu cycles to execute
 
     // BRK
     myasm = addopcode(&opmap, 0x00, "0x00 BRK");
@@ -49,7 +52,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         // todo: this actually does something important, implement
 
-        cpu->pc += 1;
+        return 1;
     };
 
     // ADC indexed indirect
@@ -58,7 +61,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
         adc(cpu, indexedindirect(cpu, mem));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // ADC zero page
@@ -67,7 +70,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
         adc(cpu, zeropage(cpu, mem));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // ADC immediate
@@ -77,7 +80,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if (DEBUG) printf("\n%s%x\n", myasm, val);
         adc(cpu, val);
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // ADC absolute $6d
@@ -87,7 +90,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x\n", myasm, addr);
         adc(cpu, mem->readmem(addr));
 
-        cpu->pc += 3;
+        return 3;
     };
 
     // ADC indirect indexed $71
@@ -96,7 +99,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
         adc(cpu, mem->readmem(indirectindexed(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // ADC zero page,x $75
@@ -105,7 +108,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
         adc(cpu, mem->readmem(zeropagex(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // ADC absolute,y $79
@@ -114,7 +117,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
         adc(cpu, mem->readmem(absolutey(cpu, mem)));
 
-        cpu->pc += 3;
+        return 3;
     };
 
     // ADC absolute,x $7d
@@ -123,7 +126,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
         adc(cpu, mem->readmem(absolutex(cpu, mem)));
 
-        cpu->pc += 3;
+        return 3;
     };
 
     // STA indexed indirect
@@ -132,7 +135,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
         sta(cpu, mem, indexedindirect(cpu, mem));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // STA zero page
@@ -141,7 +144,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
         sta(cpu, mem, mem->readmem(zeropage(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // STA absolute
@@ -151,7 +154,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x\n", myasm, addr);
         sta(cpu, mem, mem->readmem(addr));
 
-        cpu->pc += 3;
+        return 3;
     };
 
     // STA indirect indexed
@@ -160,7 +163,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
         sta(cpu, mem, mem->readmem(indirectindexed(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // STA zero page,x
@@ -169,7 +172,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
         sta(cpu, mem, mem->readmem(zeropagex(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // STA absolute,y
@@ -178,7 +181,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
         sta(cpu, mem, mem->readmem(absolutey(cpu, mem)));
 
-        cpu->pc += 3;
+        return 3;
     };
 
     // STA absolute,x
@@ -187,7 +190,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
         sta(cpu, mem, mem->readmem(absolutex(cpu, mem)));
 
-        cpu->pc += 3;
+        return 3;
     };
 
     // STA zero page,y??? does it exist? nope
@@ -201,7 +204,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
         lda(cpu, mem->readmem(indexedindirect(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // LDA zero page
@@ -212,7 +215,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         // I think passing a uint8_t to a uint16_t should work without issue
         lda(cpu, mem->readmem(zeropage(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // LDA immediate
@@ -222,7 +225,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x\n", myasm, val);
         lda(cpu, val);
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // LDA $0314 constant
@@ -239,7 +242,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         lda(cpu, mem->readmem(addr));
         if(DEBUG) printf("\n%s%x\n", myasm, addr);
 
-        cpu->pc += 3;
+        return 3;
     };
 
     // LDA indirect indexed
@@ -248,7 +251,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
         lda(cpu, mem->readmem(indirectindexed(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // LDA zero page,X
@@ -257,7 +260,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
         lda(cpu, mem->readmem(zeropagex(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // LDA absolute,Y
@@ -265,7 +268,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     opmap[0xb9]->f = [cpu, mem, myasm]() {
         if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
         lda(cpu, mem->readmem(absolutey(cpu, mem)));
-        cpu->pc += 3;
+        return 3;
     };
 
     // 0xbd LDA absolute,X
@@ -273,12 +276,8 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     opmap[0xbd]->f = [cpu, mem, myasm]() {
         if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
         lda(cpu, mem->readmem(absolutex(cpu, mem)));
-        cpu->pc += 3;
+        return 3;
     };
-
-    // dummy because we can't for loop up to 0xff on a uint8_t
-    myasm = addopcode(&opmap, 0xff, "DNE");
-    opmap[0xff]->f = [cpu]() { printf("\n0xff DNE\n"); cpu->pc++; };
 
     /*
     SBC #$NN	Immediate	$e9	CZ- - - VN
@@ -296,7 +295,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
         sbc(cpu, zeropage(cpu, mem));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // SBC immediate
@@ -306,7 +305,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if (DEBUG) printf("\n%s%x\n", myasm, val);
         sbc(cpu, val);
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // SBC absolute $ed
@@ -316,7 +315,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x\n", myasm, addr);
         adc(cpu, mem->readmem(addr));
 
-        cpu->pc += 3;
+        return 3;
     };
 
     // SBC indirect indexed $f1
@@ -325,7 +324,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
         sbc(cpu, mem->readmem(indirectindexed(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // SBC zero page,x $f5
@@ -334,7 +333,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
         sbc(cpu, mem->readmem(zeropagex(cpu, mem)));
 
-        cpu->pc += 2;
+        return 2;
     };
 
     // SBC absolute,y $f9
@@ -343,7 +342,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
         sbc(cpu, mem->readmem(absolutey(cpu, mem)));
 
-        cpu->pc += 3;
+        return 3;
     };
 
     // SBC absolute,x $fd
@@ -352,8 +351,12 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
         sbc(cpu, mem->readmem(absolutex(cpu, mem)));
 
-        cpu->pc += 3;
+        return 3;
     };
+
+    // dummy because we can't for loop up to 0xff on a uint8_t
+    myasm = addopcode(&opmap, 0xff, "DNE");
+    opmap[0xff]->f = [cpu]() { printf("\n0xff DNE\n"); return 1; };
 
     return opmap;
 }
