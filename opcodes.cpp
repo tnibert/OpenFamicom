@@ -318,42 +318,42 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 3;
     };
-/*
-    // ADC indirect indexed $71
-    myasm = addopcode(&opmap, 0x71, "0x71 adc ($");
-    opmap[0x71]->f = [cpu, mem, myasm]() {
+
+    // SBC indirect indexed $f1
+    myasm = addopcode(&opmap, 0xf1, "0xf1 sbc ($");
+    opmap[0xf1]->f = [cpu, mem, myasm]() {
         if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
-        adc(cpu, mem->readmem(indirectindexed(cpu, mem)));
+        sbc(cpu, mem->readmem(indirectindexed(cpu, mem)));
 
         cpu->pc += 2;
     };
 
-    // ADC zero page,x $75
-    myasm = addopcode(&opmap, 0x75, "0x75 adc $");
-    opmap[0x75]->f = [cpu, mem, myasm]() {
+    // SBC zero page,x $f5
+    myasm = addopcode(&opmap, 0xf5, "0xf5 sbc $");
+    opmap[0xf5]->f = [cpu, mem, myasm]() {
         if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
-        adc(cpu, mem->readmem(zeropagex(cpu, mem)));
+        sbc(cpu, mem->readmem(zeropagex(cpu, mem)));
 
         cpu->pc += 2;
     };
 
-    // ADC absolute,y $79
-    myasm = addopcode(&opmap, 0x79, "0x79 adc $");
-    opmap[0x79]->f = [cpu, mem, myasm]() {
+    // SBC absolute,y $f9
+    myasm = addopcode(&opmap, 0xf9, "0xf9 sbc $");
+    opmap[0xf9]->f = [cpu, mem, myasm]() {
         if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
-        adc(cpu, mem->readmem(absolutey(cpu, mem)));
+        sbc(cpu, mem->readmem(absolutey(cpu, mem)));
 
         cpu->pc += 3;
     };
 
-    // ADC absolute,x $7d
-    myasm = addopcode(&opmap, 0x7d, "0x7d adc $");
-    opmap[0x7d]->f = [cpu, mem, myasm]() {
+    // SBC absolute,x $fd
+    myasm = addopcode(&opmap, 0xfd, "0xfd sbc $");
+    opmap[0xfd]->f = [cpu, mem, myasm]() {
         if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
-        adc(cpu, mem->readmem(absolutex(cpu, mem)));
+        sbc(cpu, mem->readmem(absolutex(cpu, mem)));
 
         cpu->pc += 3;
     };
-*/
+
     return opmap;
 }
