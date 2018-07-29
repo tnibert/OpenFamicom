@@ -70,6 +70,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 2;
     };
 
+    // CLI 0x58
+    myasm = addopcode(&opmap, 0x58, "0x58 cli");
+    opmap[0x58]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+
+        // clear interrupt disable flag
+        cpu->p &= ~(1 << 5);
+
+        cpu->pc += 1;
+        return 2;
+    };
+
     // ADC indexed indirect
     myasm = addopcode(&opmap, 0x61, "0x61 adc ($");
     opmap[0x61]->f = [cpu, mem, myasm]() {
@@ -131,6 +143,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 4;
+    };
+
+    // SEI 0x78
+    myasm = addopcode(&opmap, 0x78, "0x78 sei");
+    opmap[0x78]->f = [cpu, myasm] () {
+        if(DEBUG) printf("\n%s\n", myasm);
+
+        // set interrupt disable flag
+        cpu->p |= (1 << 5);
+
+        cpu->pc += 1;
+        return 2;
     };
 
     // ADC absolute,y $79
