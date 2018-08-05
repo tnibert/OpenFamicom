@@ -123,6 +123,8 @@ uint16_t zeropage(cpustate *, Memory *);
 
 uint16_t zeropagex(cpustate *, Memory *);
 
+uint16_t zeropagey(cpustate *, Memory *);
+
 uint16_t indirectindexed(cpustate *, Memory *);
 
 uint16_t absolutey(cpustate *, Memory *);

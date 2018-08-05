@@ -266,11 +266,10 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     };
 
     // STX zero page,y 0x96
-    myasm = addopcode(&opmap, 0x96, "0x96 stx ZEROPAGE,Y TO IMPLEMENT");
-    // todo: implement zeropage,y addressing
+    myasm = addopcode(&opmap, 0x96, "0x96 stx $");
     opmap[0x96]->f = [cpu, mem, myasm]() {
-        if (DEBUG) printf("\n%s\n", myasm);    //printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
-        //stx(cpu, mem, mem->readmem(zeropagey(cpu, mem)));
+        if (DEBUG) printf("\n%s%x,Y\n", myasm, mem->readmem(cpu->pc+1));
+        stx(cpu, mem, mem->readmem(zeropagey(cpu, mem)));
 
         cpu->pc += 2;
         return 4;

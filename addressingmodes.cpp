@@ -29,6 +29,11 @@ uint16_t zeropagex(cpustate * cpu, Memory * mem)
     return mem->readmem(cpu->pc+1)+cpu->x;
 }
 
+uint16_t zeropagey(cpustate * cpu, Memory * mem)
+{
+    return mem->readmem(cpu->pc+1)+cpu->y;
+}
+
 uint16_t indirectindexed(cpustate * cpu, Memory * mem)
 {
     uint8_t zpageaddr = mem->readmem(cpu->pc+1);
