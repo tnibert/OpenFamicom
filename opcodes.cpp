@@ -446,6 +446,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;
     };
 
+    // INC absolute $ee
+    myasm = addopcode(&opmap, 0xee, "0xee inc $");
+    opmap[0xee]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));
+        if (DEBUG) printf("\n%s%x\n", myasm, addr);
+        inc(cpu, mem, addr);
+
+        cpu->pc += 3;
+        return 6;
+    };
+
     // SBC indirect indexed $f1
     myasm = addopcode(&opmap, 0xf1, "0xf1 sbc ($");
     opmap[0xf1]->f = [cpu, mem, myasm]() {
@@ -465,6 +476,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 4;
+    };
+
+    // INC zero page,x $f6
+    myasm = addopcode(&opmap, 0xf6, "0xf6 inc $");
+    opmap[0xf6]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, mem->readmem(cpu->pc + 1));
+        inc(cpu, mem, zeropagex(cpu, mem));
+
+        cpu->pc += 2;
+        return 6;
     };
 
     // SBC absolute,y $f9
@@ -487,6 +508,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 3;
         return 4;
         // todo +1 if page crossed
+    };
+
+    // INC absolute,x $fe
+    myasm = addopcode(&opmap, 0xfe, "0xfe inc $");
+    opmap[0xfe]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        inc(cpu, mem, absolutex(cpu, mem));
+
+        cpu->pc += 3;
+        return 7;
     };
 
     // dummy because we can't for loop up to 0xff on a uint8_t
