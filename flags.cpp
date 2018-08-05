@@ -4,10 +4,10 @@
  * setter functions return true or false based on whether flag was set or not
  */
 
-bool setzeroflag(cpustate * cpu)
+bool setzeroflag(uint8_t compval, cpustate * cpu)
 {
     // if accumulator is 0, zero flag is set
-    if(!cpu->a)
+    if(!compval)
     {
         cpu->p |= (1 << 6);
         return true;
@@ -19,10 +19,10 @@ bool setzeroflag(cpustate * cpu)
     }
 }
 
-bool setnegflag(cpustate * cpu)
+bool setnegflag(uint8_t compval, cpustate * cpu)
 {
     // if bit 7 of accumulator is on, negative flag is set
-    if(cpu->a & 0x80)
+    if(compval & 0x80)
     {
         cpu->p |= 1;
         return true;

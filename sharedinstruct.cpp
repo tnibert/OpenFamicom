@@ -160,8 +160,8 @@ void adc(cpustate * cpu, uint8_t arg)
     // I think the front bits will just fall off if we overflow the uint8_t??
     cpu->a = sum;
 
-    setnegflag(cpu);
-    setzeroflag(cpu);
+    setnegflag(cpu->a, cpu);
+    setzeroflag(cpu->a, cpu);
 }
 
 void sbc(cpustate * cpu, uint8_t arg) { adc(cpu, ~arg); }
@@ -175,8 +175,8 @@ void AND(cpustate * cpu, uint8_t arg)
      */
     cpu->a = cpu->a & arg;
 
-    setzeroflag(cpu);
-    setnegflag(cpu);
+    setzeroflag(cpu->a, cpu);
+    setnegflag(cpu->a, cpu);
 }
 
 void OR()
@@ -205,4 +205,26 @@ void lsr()
 void ror()
 {
 
+}
+
+
+void inc(cpustate * cpu, Memory * mem, uint16_t finaladdr)
+{
+    /* Adds one to the value held at a specified memory location setting the zero and negative flags as appropriate.
+     * sets zero and negative flags
+        cpu - cpustate struct,
+        mem - cpu memory class
+        finaladdr - the address directly pointing to the value to increment (after addressing mode translation)
+        todo: unit test
+     */
+    uint8_t val = mem->readmem(finaladdr);
+    if(val == 255)
+    val++;
+    mem->writemem(finaladdr, val);
+
+    // zero flag set or unset
+    setzeroflag(val, cpu);
+
+    // negative flag ser or unset
+    setnegflag(val, cpu);
 }
