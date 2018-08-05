@@ -394,6 +394,20 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         // todo: +1 if page crossed
     };
 
+    // INY 0xc8
+    myasm = addopcode(&opmap, 0xc8, "0xc8 iny");
+    opmap[0xc8]->f = [cpu, myasm]() {
+        if (DEBUG) printf("\n%s\n", myasm);
+
+        cpu->y++;
+
+        setzeroflag(cpu->y, cpu);
+        setnegflag(cpu->y, cpu);
+
+        cpu->pc += 1;
+        return 2;
+    };
+
     /*
     SBC #$NN	Immediate	$e9	CZ- - - VN
     SBC $NNNN	Absolute	$ed	CZ- - - VN
@@ -422,6 +436,21 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 5;
+    };
+
+    // INX (implied addressing mode 0xe8
+    myasm = addopcode(&opmap, 0xe8, "0xe8 inx");
+    opmap[0xe8]->f = [cpu, myasm]() {
+        if (DEBUG) printf("\n%s\n", myasm);
+
+        cpu->x++;
+
+        setzeroflag(cpu->x, cpu);
+        // todo: I wonder if just using a regular uint8_t is going to mess with our negative flag...
+        setnegflag(cpu->x, cpu);
+
+        cpu->pc += 1;
+        return 2;
     };
 
     // SBC immediate
