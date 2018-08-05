@@ -414,6 +414,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
+    // INC zero page 0xe6
+    myasm = addopcode(&opmap, 0xe6, "0xe6 inc $");
+    opmap[0xe6]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        inc(cpu, mem, mem->readmem(cpu->pc + 1));
+
+        cpu->pc += 2;
+        return 5;
+    };
+
     // SBC immediate
     myasm = addopcode(&opmap, 0xe9, "0xe9 sbc #$");
     opmap[0xe9]->f = [cpu, mem, myasm]() {

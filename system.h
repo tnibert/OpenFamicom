@@ -115,6 +115,7 @@ void stx(cpustate *, Memory *, uint16_t);
 void sty(cpustate *, Memory *, uint16_t);
 void adc(cpustate *, uint8_t);
 void sbc(cpustate *, uint8_t);
+void inc(cpustate *, Memory *, uint16_t);
 
 // addressing modes
 uint16_t indexedindirect(cpustate *, Memory *);
