@@ -203,6 +203,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 6;
     };
 
+    // STY zero page 0x84
+    myasm = addopcode(&opmap, 0x84, "0x84 sty $");
+    opmap[0x84]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        sty(cpu, mem, mem->readmem(zeropage(cpu, mem)));
+
+        cpu->pc += 2;
+        return 3;
+    };
+
     // STA zero page
     myasm = addopcode(&opmap, 0x85, "0x85 sta $");
     opmap[0x85]->f = [cpu, mem, myasm]() {
