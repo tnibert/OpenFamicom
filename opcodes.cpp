@@ -233,12 +233,27 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
+    // STY absolute 0x8c
+    myasm = addopcode(&opmap, 0x8c, "0x8c sty $");
+    opmap[0x8c]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        // I don't think previous method of absolute addressing is correct
+        // we now write directory to addr address, not the address read from there
+        // should be correct now, but also check absolute,x and absolute,y (I think they are correct)
+        // all in all - todo: unit test
+        sty(cpu, mem, addr);
+
+        cpu->pc += 3;
+        return 4;
+    };
+
     // STA absolute
     myasm = addopcode(&opmap, 0x8d, "0x8d sta $");
     opmap[0x8d]->f = [cpu, mem, myasm]() {
         uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
         if(DEBUG) printf("\n%s%x\n", myasm, addr);
-        sta(cpu, mem, mem->readmem(addr));
+        sta(cpu, mem, addr);
 
         cpu->pc += 3;
         return 4;
@@ -249,7 +264,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     opmap[0x8e]->f = [cpu, mem, myasm]() {
         uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
         if(DEBUG) printf("\n%s%x\n", myasm, addr);
-        stx(cpu, mem, mem->readmem(addr));
+        stx(cpu, mem, addr);
 
         cpu->pc += 3;
         return 4;
@@ -263,6 +278,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 6;
+    };
+
+    // STY zero page,x 0x94
+    myasm = addopcode(&opmap, 0x94, "0x94 sty $");
+    opmap[0x94]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
+        sty(cpu, mem, mem->readmem(zeropagex(cpu, mem)));
+
+        cpu->pc += 2;
+        return 4;
     };
 
     // STA zero page,x
