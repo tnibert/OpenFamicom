@@ -357,6 +357,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
+    // TAY 0xa8
+    myasm = addopcode(&opmap, 0xa8, "0xa8 tay");
+    opmap[0xa8]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        cpu->y = cpu->a;
+        setzeroflag(cpu->y, cpu);
+        setnegflag(cpu->y, cpu);
+
+        cpu->pc += 1;
+        return 2;
+    };
+
     // LDA immediate
     myasm = addopcode(&opmap, 0xa9, "0xa9 lda #$");
     opmap[0xa9]->f = [cpu, mem, myasm]() {
@@ -365,6 +377,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         lda(cpu, val);
 
         cpu->pc += 2;
+        return 2;
+    };
+
+    // TAX 0xaa
+    myasm = addopcode(&opmap, 0xaa, "0xaa tax");
+    opmap[0xaa]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        cpu->x = cpu->a;
+        setzeroflag(cpu->x, cpu);
+        setnegflag(cpu->x, cpu);
+
+        cpu->pc += 1;
         return 2;
     };
 
