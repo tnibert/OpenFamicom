@@ -233,6 +233,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
+    // TXA 0x8a
+    myasm = addopcode(&opmap, 0x8a, "0x8a txa");
+    opmap[0x8a]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        cpu->a = cpu->x;
+        setzeroflag(cpu->a, cpu);
+        setnegflag(cpu->a, cpu);
+
+        cpu->pc += 1;
+        return 2;
+    };
+
     // STY absolute 0x8c
     myasm = addopcode(&opmap, 0x8c, "0x8c sty $");
     opmap[0x8c]->f = [cpu, mem, myasm]() {
@@ -310,6 +322,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;
     };
 
+    // TYA 0x98
+    myasm = addopcode(&opmap, 0x98, "0x98 tya");
+    opmap[0x98]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        cpu->a = cpu->y;
+        setzeroflag(cpu->a, cpu);
+        setnegflag(cpu->a, cpu);
+
+        cpu->pc += 1;
+        return 2;
+    };
+
     // STA absolute,y
     myasm = addopcode(&opmap, 0x99, "0x99 sta $");
     opmap[0x99]->f = [cpu, mem, myasm]() {
@@ -318,6 +342,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 3;
         return 5;
+    };
+
+    // TXS 0x9a
+    myasm = addopcode(&opmap, 0x9a, "0x9a txs");
+    opmap[0x9a]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        cpu->sp = cpu->x;
+
+        cpu->pc += 1;
+        return 2;
     };
 
     // STA absolute,x
@@ -440,6 +474,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 3;
         return 4;
         // todo: +1 if page crossed
+    };
+
+    // 0xba TSX
+    myasm = addopcode(&opmap, 0xba, "0xba tsx");
+    opmap[0xba]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        cpu->x = cpu->sp;
+        setzeroflag(cpu->x, cpu);
+        setnegflag(cpu->x, cpu);
+
+        cpu->pc += 1;
+        return 2;
     };
 
     // 0xbd LDA absolute,X
