@@ -25,6 +25,19 @@ const char * addopcode(std::map<uint8_t, std::shared_ptr<opcode> > * curmap, uin
 
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Memory * mem)
 {
+    /*
+     * todo: implement:
+     * ROR, ASL, LSR, ROL
+     * PLP, PLA, PHP, PHA
+     * ORA, EOR, AND
+     * NOP
+     * LDX, LDY
+     * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
+     * DEY, DEX, DEC
+     * CPY, CPX, CMP
+     * CLV, CLD
+     * BIT
+     */
     // http://obelisk.me.uk/6502/reference.html
 
     std::map<uint8_t, std::shared_ptr<opcode> > opmap;
@@ -46,15 +59,14 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     // todo: unit test all opcodes
     // http://www.emulator101.com/reference/6502-reference.html
 
-    // note: all opcode functions return number of cpu cycles to execute and execute the program counter the appropriate number of bytes
+    // note: all opcode functions return number of cpu cycles to execute and advance the program counter the appropriate number of bytes
 
     // BRK
     myasm = addopcode(&opmap, 0x00, "0x00 BRK");
     opmap[0x00]->f = [cpu, myasm]() {
         printf("\n%s\n", myasm);
 
-        // todo: this actually does something important, implement
-        // forces the generation of an interrupt request
+        // todo: generates interrupts, implement properly
 
         cpu->pc += 1;
         return 7;
@@ -620,6 +632,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 6;
+    };
+
+    // SED 0xf8 - shouldn't be used on NES, but apparently is?
+    myasm = addopcode(&opmap, 0xf8, "0xf8 sed");
+    opmap[0xf8]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+
+        // set decimal mode flag
+        cpu->p |= (1 << 4);
+
+        cpu->pc += 1;
+        return 2;
     };
 
     // SBC absolute,y $f9
