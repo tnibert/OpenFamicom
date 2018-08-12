@@ -179,9 +179,12 @@ void AND(cpustate * cpu, uint8_t arg)
     setnegflag(cpu->a, cpu);
 }
 
-void OR()
+void ORA(cpustate * cpu, uint8_t arg)
 {
+    cpu->a = cpu->a | arg;
 
+    setzeroflag(cpu->a, cpu);
+    setnegflag(cpu->a, cpu);
 }
 
 void EOR()

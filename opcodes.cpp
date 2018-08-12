@@ -29,7 +29,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * todo: implement:
      * ROR, ASL, LSR, ROL
      * PLP, PLA, PHP, PHA
-     * ORA, EOR, AND
+     * ORA, EOR
      * NOP
      * LDX, LDY
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
@@ -71,6 +71,30 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 1;
         return 7;
     };
+
+    // ORA zero page 0x05
+    myasm = addopcode(&opmap, 0x5, "0x05 ora $");
+    opmap[0x5]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        ORA(cpu, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+        return 3;
+    };
+
+    // ORA immedate 0x09
+    myasm = addopcode(&opmap, 0x9, "0x09 ora #$");
+    opmap[0x9]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        ORA(cpu, mem->readmem(cpu->pc+1));
+
+        cpu->pc += 2;
+        return 2;
+    };
+
+    // ORA absolute 0x0d (3, 4)
+
+    // ORA zero page,x (2 bytes, 4 cycles) 0x15
 
     // CLC 0x18
     myasm = addopcode(&opmap, 0x18, "0x18 clc");
