@@ -84,6 +84,39 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 2;
     };
 
+    // AND zero page 0x25
+    myasm = addopcode(&opmap, 0x25, "0x25 and $");
+    opmap[0x25]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        AND(cpu, zeropage(cpu, mem));
+        // flags are set in our AND() function
+
+        cpu->pc += 2;
+        return 3;
+    };
+
+    // AND immediate 0x29
+    myasm = addopcode(&opmap, 0x29, "0x29 and #$");
+    opmap[0x29]->f = [cpu, mem, myasm]() {
+        // ok, immediate addressing specifies a constant in the code
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        AND(cpu, mem->readmem(cpu->pc+1));
+
+        cpu->pc += 2;
+        return 2;
+    };
+
+    // AND zero page,x 0x35
+    myasm = addopcode(&opmap, 0x35, "0x35 and $");
+    opmap[0x35]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, mem->readmem(cpu->pc + 1));
+        AND(cpu, mem->readmem(zeropagex(cpu, mem)));
+        // flags are set in our AND() function
+
+        cpu->pc += 2;
+        return 4;
+    };
+
     // SEC 0x38
     myasm = addopcode(&opmap, 0x38, "0x38 sec");
     opmap[0x38]->f = [cpu, myasm]() {
