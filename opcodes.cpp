@@ -84,6 +84,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 2;
     };
 
+    // AND indirect,x 0x21
+    myasm = addopcode(&opmap, 0x21, "0x21 and ($");
+    opmap[0x21]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
+        AND(cpu, indexedindirect(cpu, mem));
+
+        cpu->pc += 2;
+        return 6;
+    };
+
     // AND zero page 0x25
     myasm = addopcode(&opmap, 0x25, "0x25 and $");
     opmap[0x25]->f = [cpu, mem, myasm]() {
@@ -117,6 +127,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;
     };
 
+    // AND indirect,y 0x31
+    myasm = addopcode(&opmap, 0x31, "0x31 and ($");
+    opmap[0x31]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
+        AND(cpu, indirectindexed(cpu, mem));
+
+        cpu->pc += 2;
+        return 5;   // todo: +1 if page crossed
+    };
+
     // AND zero page,x 0x35
     myasm = addopcode(&opmap, 0x35, "0x35 and $");
     opmap[0x35]->f = [cpu, mem, myasm]() {
@@ -138,6 +158,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 1;
         return 2;
+    };
+
+    // AND absolute,y 0x39
+    myasm = addopcode(&opmap, 0x39, "0x39 and $");
+    opmap[0x39]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
+        AND(cpu, mem->readmem(absolutey(cpu, mem)));
+
+        cpu->pc += 3;
+        return 4; // todo: +1 if page crossed
     };
 
     // AND absolute,x 0x3d

@@ -11,6 +11,7 @@
 
 uint16_t indexedindirect(cpustate * cpu, Memory * mem)
 {
+    // (Indirect,X)
     uint8_t zpageaddr = mem->readmem(cpu->pc+1);
     uint16_t addr = zpageaddr + cpu->x;
     // we have to read from addr to find the new addr to load from?
@@ -36,6 +37,7 @@ uint16_t zeropagey(cpustate * cpu, Memory * mem)
 
 uint16_t indirectindexed(cpustate * cpu, Memory * mem)
 {
+    // (Indirect),Y
     uint8_t zpageaddr = mem->readmem(cpu->pc+1);
     uint16_t addr = (revlendianbytes(mem->readmem(zpageaddr), mem->readmem(zpageaddr+1))) + cpu->y;
     return addr;
