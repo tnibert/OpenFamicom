@@ -106,6 +106,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 2;
     };
 
+    // AND absolute 0x2d
+    myasm = addopcode(&opmap, 0x2d, "0x2d and $");
+    opmap[0x2d]->f = [cpu, mem, myasm] () {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        AND(cpu, mem->readmem(addr));
+
+        cpu->pc += 3;
+        return 4;
+    };
+
     // AND zero page,x 0x35
     myasm = addopcode(&opmap, 0x35, "0x35 and $");
     opmap[0x35]->f = [cpu, mem, myasm]() {
@@ -127,6 +138,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 1;
         return 2;
+    };
+
+    // AND absolute,x 0x3d
+    myasm = addopcode(&opmap, 0x3d, "0x3d and $");
+    opmap[0x3d]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        AND(cpu, mem->readmem(absolutex(cpu, mem)));
+
+        cpu->pc += 3;
+        return 4; // todo: +1 if page crossed
     };
 
     // CLI 0x58
