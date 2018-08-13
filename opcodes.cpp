@@ -82,6 +82,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
+    // PHP 0x08
+    myasm = addopcode(&opmap, 0x8, "0x08 php");
+    opmap[0x8]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s\n", myasm);
+        push(cpu, mem, cpu->p);
+
+        cpu->pc += 1;
+        return 3;
+    };
+
     // ORA immedate 0x09
     myasm = addopcode(&opmap, 0x9, "0x09 ora #$");
     opmap[0x9]->f = [cpu, mem, myasm]() {
@@ -127,6 +137,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 3;
+    };
+
+    // PLP 0x28
+    myasm = addopcode(&opmap, 0x28, "0x28 plp");
+    opmap[0x28]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s\n", myasm);
+        cpu->p = pop(cpu, mem);
+
+        cpu->pc += 1;
+        return 4;
     };
 
     // AND immediate 0x29
@@ -246,11 +266,11 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
-    // PLA 0x48
+    // PLA 0x68
     myasm = addopcode(&opmap, 0x68, "0x68 pla");
     opmap[0x68]->f = [cpu, mem, myasm]() {
         if (DEBUG) printf("\n%s\n", myasm);
-        pop(cpu, mem, &cpu->a);
+        cpu->a = pop(cpu, mem);
         setzeroflag(cpu->a, cpu);
         setnegflag(cpu->a, cpu);
 

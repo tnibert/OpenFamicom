@@ -295,7 +295,7 @@ void push(cpustate * cpu, Memory * mem, uint8_t val)
     cpu->sp--;
 }
 
-void pop(cpustate * cpu, Memory * mem, uint8_t * storageloc)
+uint8_t pop(cpustate * cpu, Memory * mem)
 {
     /*
      * pop a value from the stack
@@ -303,5 +303,5 @@ void pop(cpustate * cpu, Memory * mem, uint8_t * storageloc)
      * storageloc: a point to the cpu register that we are storing the memory read to
      */
     cpu->sp++;
-    *storageloc = mem->readmem(cpu->sp);
+    return mem->readmem(cpu->sp);
 }
