@@ -276,3 +276,30 @@ void compare(cpustate * cpu, Memory * mem, uint8_t reg, uint16_t addr)
     // set negative flag if bit 7 of the result is set
     setnegflag(result, cpu);
 }
+
+/*
+ * For push and pull, the 6502 is an EMPTY STACK
+ * https://wiki.nesdev.com/w/index.php/Stack
+ * todo: the addressing for our stack pointer might be wrong... verify
+ */
+
+void push(cpustate * cpu, Memory * mem, uint8_t val)
+{
+    /*
+     * Push a value to the stack
+     * write to stack pointer address, then decrement stack pointer by 1
+     */
+    mem->writemem(cpu->sp, val);
+    cpu->sp--;
+}
+
+void pop(cpustate * cpu, Memory * mem, uint8_t * storageloc)
+{
+    /*
+     * pop a value from the stack
+     * increment stack pointer by 1, then read from stack point address
+     * storageloc: a point to the cpu register that we are storing the memory read to
+     */
+    cpu->sp++;
+    *storageloc = mem->readmem(cpu->sp);
+}
