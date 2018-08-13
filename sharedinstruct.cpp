@@ -281,6 +281,8 @@ void compare(cpustate * cpu, Memory * mem, uint8_t reg, uint16_t addr)
  * For push and pull, the 6502 is an EMPTY STACK
  * https://wiki.nesdev.com/w/index.php/Stack
  * todo: the addressing for our stack pointer might be wrong... verify
+ * Can we initialize it to different locations at the start?
+ * Do we need to handle stack overflow and underflow?
  */
 
 void push(cpustate * cpu, Memory * mem, uint8_t val)

@@ -28,8 +28,8 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     /*
      * todo: implement:
      * ROR, ASL, LSR, ROL
-     * PLP, PLA, PHP, PHA
-     * ORA, EOR
+     * PLP, PHP
+     * ORA (rest of), EOR
      * NOP
      * LDX, LDY
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
@@ -204,6 +204,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4; // todo: +1 if page crossed
     };
 
+    // PHA 0x48
+    myasm = addopcode(&opmap, 0x48, "0x48 pha");
+    opmap[0x48]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s\n", myasm);
+        push(cpu, mem, cpu->a);
+
+        cpu->pc += 1;
+        return 3;
+    };
+
     // CLI 0x58
     myasm = addopcode(&opmap, 0x58, "0x58 cli");
     opmap[0x58]->f = [cpu, myasm]() {
@@ -234,6 +244,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 3;
+    };
+
+    // PLA 0x48
+    myasm = addopcode(&opmap, 0x68, "0x68 pla");
+    opmap[0x68]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s\n", myasm);
+        pop(cpu, mem, &cpu->a);
+        setzeroflag(cpu->a, cpu);
+        setnegflag(cpu->a, cpu);
+
+        cpu->pc += 1;
+        return 4;
     };
 
     // ADC immediate
