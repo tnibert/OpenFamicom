@@ -231,3 +231,48 @@ void inc(cpustate * cpu, Memory * mem, uint16_t finaladdr)
     // negative flag ser or unset
     setnegflag(val, cpu);
 }
+
+void compare(cpustate * cpu, Memory * mem, uint8_t reg, uint16_t addr)
+{
+    /*
+     * Used for CMP, CPX, and CPY
+     * reg: the register to compare against
+     * addr: the final memory address to retrieve the value from
+     *
+     * http://www.6502.org/tutorials/compare_instructions.html
+     * The compare instructions subtract (without carry) an immediate value or the contents of a memory location from
+     * the addressed register, but do not save the result in the register. The only indications of the results are the
+     * states of the three status flags: Negative (N), Zero (Z), and Carry (C). The combination of these three flags
+     * indicate whether the register contents are less than, equal to (the same as), or greater than the operand "data"
+     * (the immediate value or contents of the addressed memory location.
+     */
+    uint8_t value = mem->readmem(addr);
+    // we probably *should* use the result value to calculate the flags, but hey, power of abstraction
+    uint8_t result = reg - value;
+
+    /* from MOS 6502 programming manual:
+    the carry flag is set when the value in
+    memory is less than or equal to the accumulator, reset when it is
+    greater than the accumulator*/
+    if(reg >= value)
+    {
+        cpu->p |= (1 << 7);
+    }
+    else
+    {
+        cpu->p &= ~(1 << 7);
+    }
+
+    // if equal set zero flag
+    if(reg == value)
+    {
+        cpu->p |= (1 << 6);
+    }
+    else
+    {
+        cpu->p &= ~(1 << 6);
+    }
+
+    // set negative flag if bit 7 of the result is set
+    setnegflag(result, cpu);
+}

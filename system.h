@@ -118,6 +118,7 @@ void sbc(cpustate *, uint8_t);
 void inc(cpustate *, Memory *, uint16_t);
 void AND(cpustate *, uint8_t);
 void ORA(cpustate *, uint8_t);
+void compare(cpustate *, uint8_t, uint16_t);
 
 // addressing modes
 uint16_t indexedindirect(cpustate *, Memory *);
