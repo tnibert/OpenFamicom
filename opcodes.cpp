@@ -29,7 +29,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * todo: implement:
      * ROR, ASL, LSR, ROL
      * PLP, PHP
-     * ORA (rest of), EOR
+     * EOR
      * NOP
      * LDX, LDY
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
@@ -72,6 +72,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 7;
     };
 
+    // ORA 0x01 indirect,x
+    myasm = addopcode(&opmap, 0x1, "0x01 ora ($");
+    opmap[0x1]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
+        ORA(cpu, indexedindirect(cpu, mem));
+
+        cpu->pc += 2;
+        return 6;
+    };
+
     // ORA zero page 0x05
     myasm = addopcode(&opmap, 0x5, "0x05 ora $");
     opmap[0x5]->f = [cpu, mem, myasm]() {
@@ -103,8 +113,36 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     };
 
     // ORA absolute 0x0d (3, 4)
+    myasm = addopcode(&opmap, 0xd, "0x0d ora $");
+    opmap[0xd]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        ORA(cpu, mem->readmem(addr));
+
+        cpu->pc += 3;
+        return 4;
+    };
+
+    // ORA 0x11 indirect,y
+    myasm = addopcode(&opmap, 0x11, "0x11 ora ($");
+    opmap[0x11]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
+        ORA(cpu, indirectindexed(cpu, mem));
+
+        cpu->pc += 2;
+        return 5;   // todo: +1 if page crossed
+    };
+
 
     // ORA zero page,x (2 bytes, 4 cycles) 0x15
+    myasm = addopcode(&opmap, 0x15, "0x15 ora $");
+    opmap[0x15]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, mem->readmem(cpu->pc + 1));
+        ORA(cpu, mem->readmem(zeropagex(cpu, mem)));
+
+        cpu->pc += 2;
+        return 4;
+    };
 
     // CLC 0x18
     myasm = addopcode(&opmap, 0x18, "0x18 clc");
@@ -116,6 +154,26 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 1;
         return 2;
+    };
+
+    // ORA absolute,x 0x1D
+    myasm = addopcode(&opmap, 0x1d, "0x1d ora $");
+    opmap[0x1d]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        ORA(cpu, mem->readmem(absolutex(cpu, mem)));
+
+        cpu->pc += 3;
+        return 4; // todo: +1 if page crossed
+    };
+
+    // ORA absolute,y 0x19
+    myasm = addopcode(&opmap, 0x19, "0x19 ora $");
+    opmap[0x19]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
+        ORA(cpu, mem->readmem(absolutey(cpu, mem)));
+
+        cpu->pc += 3;
+        return 4; // todo: +1 if page crossed
     };
 
     // AND indirect,x 0x21
