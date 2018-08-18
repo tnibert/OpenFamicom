@@ -591,7 +591,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     opmap[0xa1]->f = [cpu, mem, myasm]() {
         // todo: the readmem method returns a uint8_t, should it return uint16_t?
         if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
-        lda(cpu, mem->readmem(indexedindirect(cpu, mem)));
+        ld(&cpu->a, cpu, mem->readmem(indexedindirect(cpu, mem)));
 
         cpu->pc += 2;
         return 6;
@@ -603,7 +603,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         // todo: UNTESTED
         if(DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
         // I think passing a uint8_t to a uint16_t should work without issue
-        lda(cpu, mem->readmem(zeropage(cpu, mem)));
+        ld(&cpu->a, cpu, mem->readmem(zeropage(cpu, mem)));
 
         cpu->pc += 2;
         return 3;
@@ -626,7 +626,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     opmap[0xa9]->f = [cpu, mem, myasm]() {
         uint8_t val = mem->readmem(cpu->pc+1);
         if(DEBUG) printf("\n%s%x\n", myasm, val);
-        lda(cpu, val);
+        ld(&cpu->a, cpu, val);
 
         cpu->pc += 2;
         return 2;
@@ -655,7 +655,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
          */
 
         uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
-        lda(cpu, mem->readmem(addr));
+        ld(&cpu->a, cpu, mem->readmem(addr));
         if(DEBUG) printf("\n%s%x\n", myasm, addr);
 
         cpu->pc += 3;
@@ -666,7 +666,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0xb1, "0xb1 lda ($");
     opmap[0xb1]->f = [cpu, mem, myasm]() {
         if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
-        lda(cpu, mem->readmem(indirectindexed(cpu, mem)));
+        ld(&cpu->a, cpu, mem->readmem(indirectindexed(cpu, mem)));
 
         cpu->pc += 2;
         return 5;
@@ -677,7 +677,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0xb5, "0xb5 lda $");
     opmap[0xb5]->f = [cpu, mem, myasm]() {
         if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
-        lda(cpu, mem->readmem(zeropagex(cpu, mem)));
+        ld(&cpu->a, cpu, mem->readmem(zeropagex(cpu, mem)));
 
         cpu->pc += 2;
         return 4;
@@ -687,7 +687,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0xb9, "0xb9 lda $");
     opmap[0xb9]->f = [cpu, mem, myasm]() {
         if(DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2)));
-        lda(cpu, mem->readmem(absolutey(cpu, mem)));
+        ld(&cpu->a, cpu, mem->readmem(absolutey(cpu, mem)));
 
         cpu->pc += 3;
         return 4;
@@ -710,7 +710,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0xbd, "0xbd lda $");
     opmap[0xbd]->f = [cpu, mem, myasm]() {
         if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
-        lda(cpu, mem->readmem(absolutex(cpu, mem)));
+        ld(&cpu->a, cpu, mem->readmem(absolutex(cpu, mem)));
 
         cpu->pc += 3;
         return 4;

@@ -18,9 +18,14 @@
 
 // todo: unit test all of this
 
-void lda(cpustate * cpu, uint8_t data)
+void ld(uint8_t * reg, cpustate * cpu, uint8_t data)
 {
-    cpu->a = data;
+    /*
+     * reg: address of the register to load to e.g. &cpu->a
+     * cpu: cpu state machine
+     * data: data to load into the register
+     */
+    *reg = data;
 
     // set flags, these are common to all LDA instructions I think
     // to set bits we use bitwise OR
@@ -33,36 +38,9 @@ void lda(cpustate * cpu, uint8_t data)
         wise resets the negative flag.
         - is that bit 7 starting at 0 or 1?
      */
-    // zero flag
-    if(!cpu->a)
-    {
-        // set 0 flag
-        // to do this we OR because Y OR 1 == 1, and Y OR 0 == 0
-        cpu->p |= 0b00000010;
-    }
-    else
-    {
-        // reset 0 flag off
-        // to do this we AND because Y AND 1 == Y
-        cpu->p &= 0b11111101;
-    }
 
-    // negative flag
-    // I'm going to assume we are setting bit 7 based on a start bit of 0
-    // that seems to make most sense for a sign bit
-    if(cpu->a & 0b10000000)           // on
-    {
-        cpu->p |= 0b10000000;
-    }
-    else            // off
-    {
-        cpu->p &= 0b01111111;
-    }
-}
-
-void ldflags(cpustate * cpu)
-{
-    // confirm whether or not lda, ldx, and ldy set flags the same way
+    setzeroflag(*reg, cpu);
+    setnegflag(*reg, cpu);
 }
 
 void sta(cpustate * cpu, Memory * mem, uint16_t addr)
