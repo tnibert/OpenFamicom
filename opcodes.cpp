@@ -719,6 +719,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         // todo: +1 if page crossed
     };
 
+    // CMP indirect,x 0xc1
+
+    // CMP zero page 0xc5
+    myasm = addopcode(&opmap, 0xc5, "0xc5 cmp $");
+    opmap[0xc5]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        compare(cpu, mem, cpu->a, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+        return 3;
+    };
+
     // INY 0xc8
     myasm = addopcode(&opmap, 0xc8, "0xc8 iny");
     opmap[0xc8]->f = [cpu, myasm]() {
@@ -732,6 +744,47 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 1;
         return 2;
     };
+
+    // CMP immediate 0xc9
+    myasm = addopcode(&opmap, 0xc9, "0xc9 cmp #$");
+    opmap[0xc9]->f = [cpu, mem, myasm]() {
+        //uint8_t val = mem->readmem(cpu->pc+1);
+        // NOTE: we reference immediate addressing differently between CMP and ADC
+        // this is something to be aware of, todo: potential bug source elsewhere
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        compare(cpu, mem, cpu->a, cpu->pc+1);
+
+        cpu->pc += 2;
+        return 2;
+    };
+
+    // CMP absolute 0xcd
+    myasm = addopcode(&opmap, 0xcd, "0xcd cmp $");
+    opmap[0xcd]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));
+        if (DEBUG) printf("\n%s%x\n", myasm, addr);
+        compare(cpu, mem, cpu->a, addr);
+
+
+        cpu->pc += 3;
+        return 4;
+    };
+
+    // CMP indirect,y 0xd1
+
+    // CMP zero page,x 0xd5
+    myasm = addopcode(&opmap, 0xd5, "0xd5 cmp $");
+    opmap[0xd5]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, mem->readmem(cpu->pc+1));
+        compare(cpu, mem, cpu->a, zeropagex(cpu, mem));
+
+        cpu->pc += 2;
+        return 4;
+    };
+
+    // CMP absolute,x 0xdd
+
+    // CMP absolute,y 0xd9
 
     /*
     SBC #$NN	Immediate	$e9	CZ- - - VN
