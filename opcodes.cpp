@@ -34,7 +34,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * LDX, LDY
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * DEY, DEX, DEC
-     * CPY, CPX, CMP
+     * CPY, CPX
      * CLV, CLD
      * BIT
      */
@@ -720,6 +720,14 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     };
 
     // CMP indirect,x 0xc1
+    myasm = addopcode(&opmap, 0xc1, "0xc1 cmp ($");
+    opmap[0xc1]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
+        compare(cpu, mem, cpu->a, indexedindirect(cpu, mem));
+
+        cpu->pc += 2;
+        return 6;
+    };
 
     // CMP zero page 0xc5
     myasm = addopcode(&opmap, 0xc5, "0xc5 cmp $");
@@ -771,6 +779,15 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     };
 
     // CMP indirect,y 0xd1
+    myasm = addopcode(&opmap, 0xd1, "0xd1 cmp ($");
+    opmap[0xd1]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
+        compare(cpu, mem, cpu->a, indirectindexed(cpu, mem));
+
+        cpu->pc += 2;
+        return 5;
+        // todo: +1 if page crossed
+    };
 
     // CMP zero page,x 0xd5
     myasm = addopcode(&opmap, 0xd5, "0xd5 cmp $");
@@ -782,9 +799,25 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;
     };
 
-    // CMP absolute,x 0xdd
-
     // CMP absolute,y 0xd9
+    myasm = addopcode(&opmap, 0xd9, "0xd9 cmp $");
+    opmap[0xd9]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        compare(cpu, mem, cpu->a, absolutey(cpu, mem));
+
+        cpu->pc += 3;
+        return 4;   // todo: +1 if page crossed
+    };
+
+    // CMP absolute,x 0xdd
+    myasm = addopcode(&opmap, 0xdd, "0xdd cmp $");
+    opmap[0xdd]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        compare(cpu, mem, cpu->a, absolutex(cpu, mem));
+
+        cpu->pc += 3;
+        return 4;   // todo: +1 if page crossed
+    };
 
     /*
     SBC #$NN	Immediate	$e9	CZ- - - VN
@@ -816,7 +849,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 5;
     };
 
-    // INX (implied addressing mode 0xe8
+    // INX implied addressing mode 0xe8
     myasm = addopcode(&opmap, 0xe8, "0xe8 inx");
     opmap[0xe8]->f = [cpu, myasm]() {
         if (DEBUG) printf("\n%s\n", myasm);
