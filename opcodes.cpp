@@ -28,9 +28,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     /*
      * todo: implement:
      * ROR, ASL, LSR, ROL
-     * PLP, PHP
      * EOR
-     * NOP
      * LDX, LDY
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * DEY, DEX, DEC
@@ -872,6 +870,15 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         sbc(cpu, val);
 
         cpu->pc += 2;
+        return 2;
+    };
+
+    // NOP 0xea
+    myasm = addopcode(&opmap, 0xea, "0xea nop");
+    opmap[0xea]->f = [cpu, myasm] () {
+        if(DEBUG) printf("\n%s\n", myasm);
+
+        cpu->pc += 1;
         return 2;
     };
 
