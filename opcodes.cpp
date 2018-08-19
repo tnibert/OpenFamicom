@@ -29,7 +29,6 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * todo: implement:
      * ROR, ASL, LSR, ROL
      * EOR
-     * LDX
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * DEY, DEX, DEC
      * CPY, CPX
@@ -606,6 +605,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 6;
     };
 
+    // LDX immediate 0xa2
+    myasm = addopcode(&opmap, 0xa2, "0xa2 ldx #$");
+    opmap[0xa2]->f = [cpu, mem, myasm]() {
+        uint8_t val = mem->readmem(cpu->pc+1);
+        if(DEBUG) printf("\n%s%x\n", myasm, val);
+        ld(&cpu->x, cpu, val);
+
+        cpu->pc += 2;
+        return 2;
+    };
+
     // LDY zero page
     myasm = addopcode(&opmap, 0xa4, "0xa4 ldy $");
     opmap[0xa4]->f = [cpu, mem, myasm]() {
@@ -624,6 +634,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if(DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
         // I think passing a uint8_t to a uint16_t should work without issue
         ld(&cpu->a, cpu, mem->readmem(zeropage(cpu, mem)));
+
+        cpu->pc += 2;
+        return 3;
+    };
+
+    // LDX zero page 0xa6
+    myasm = addopcode(&opmap, 0xa6, "0xa6 ldx $");
+    opmap[0xa6]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        // I think passing a uint8_t to a uint16_t should work without issue
+        ld(&cpu->x, cpu, mem->readmem(zeropage(cpu, mem)));
 
         cpu->pc += 2;
         return 3;
@@ -694,6 +715,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;
     };
 
+    // LDX absolute 0xae
+    myasm = addopcode(&opmap, 0xae, "0xae ldx $");
+    opmap[0xae]->f = [cpu, mem, myasm]() {
+
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        ld(&cpu->x, cpu, mem->readmem(addr));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+
+        cpu->pc += 3;
+        return 4;
+    };
+
     // LDA indirect indexed
     myasm = addopcode(&opmap, 0xb1, "0xb1 lda ($");
     opmap[0xb1]->f = [cpu, mem, myasm]() {
@@ -720,6 +753,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     opmap[0xb5]->f = [cpu, mem, myasm]() {
         if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
         ld(&cpu->a, cpu, mem->readmem(zeropagex(cpu, mem)));
+
+        cpu->pc += 2;
+        return 4;
+    };
+
+    // LDX zero page,Y 0xb6
+    myasm = addopcode(&opmap, 0xb6, "0xb6 ldx $");
+    opmap[0xb6]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,Y\n",myasm,mem->readmem(cpu->pc+1));
+        ld(&cpu->x, cpu, mem->readmem(zeropagey(cpu, mem)));
 
         cpu->pc += 2;
         return 4;
@@ -764,6 +807,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     opmap[0xbd]->f = [cpu, mem, myasm]() {
         if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
         ld(&cpu->a, cpu, mem->readmem(absolutex(cpu, mem)));
+
+        cpu->pc += 3;
+        return 4;
+        // todo: +1 if page crossed
+    };
+
+    // LDX absolute,Y 0xbe
+    myasm = addopcode(&opmap, 0xbe, "0xbe ldx $");
+    opmap[0xbe]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        ld(&cpu->x, cpu, mem->readmem(absolutey(cpu, mem)));
 
         cpu->pc += 3;
         return 4;
