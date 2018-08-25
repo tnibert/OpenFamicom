@@ -197,8 +197,8 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     myasm = addopcode(&opmap, 0x25, "0x25 and $");
     opmap[0x25]->f = [cpu, mem, myasm]() {
         if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
-        // todo: AND expects a value, this is passing an address, check other AND opcodes
-        AND(cpu, zeropage(cpu, mem));
+        // todo: AND expects a value, this was passing an address (no readmem around zeropage call), check other AND opcodes
+        AND(cpu, mem->readmem(zeropage(cpu, mem)));
         // flags are set in our AND() function
 
         cpu->pc += 2;
