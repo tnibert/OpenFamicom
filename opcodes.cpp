@@ -33,7 +33,6 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * DEY, DEX, DEC
      * CPY, CPX
      * CLV, CLD
-     * BIT
      */
     // http://obelisk.me.uk/6502/reference.html
 
