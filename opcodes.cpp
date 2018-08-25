@@ -183,10 +183,21 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 6;
     };
 
+    // BIT zero page 0x24
+    myasm = addopcode(&opmap, 0x24, "0x24 bit $");
+    opmap[0x24]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        bit(cpu, mem, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+        return 3;
+    };
+
     // AND zero page 0x25
     myasm = addopcode(&opmap, 0x25, "0x25 and $");
     opmap[0x25]->f = [cpu, mem, myasm]() {
         if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        // todo: AND expects a value, this is passing an address, check other AND opcodes
         AND(cpu, zeropage(cpu, mem));
         // flags are set in our AND() function
 
@@ -213,6 +224,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 2;
+    };
+
+    // BIT absolute 0x2c
+    myasm = addopcode(&opmap, 0x2c, "0x2c bit $");
+    opmap[0x2c]->f = [cpu, mem, myasm] () {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        bit(cpu, mem, addr);
+
+        cpu->pc += 3;
+        return 4;
     };
 
     // AND absolute 0x2d

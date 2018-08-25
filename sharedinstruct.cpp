@@ -283,3 +283,30 @@ uint8_t pop(cpustate * cpu, Memory * mem)
     cpu->sp++;
     return mem->readmem(cpu->sp);
 }
+
+void bit(cpustate * cpu, Memory * mem, uint16_t addr)
+{
+    /*
+     * Compares a memory value with accumulator and sets zero flag
+     * sets overflow and negative flags to bits 6 and 7 of memory value
+     */
+    uint8_t data = mem->readmem(addr);
+
+    // if memory and accumulator equals zero, set zero flag
+    setzeroflag(cpu->a & data, cpu);
+
+    // overflow flag set to bit 6 of the memory value
+    // we may want to incorporate this into its own function
+    // todo: verify correctness of 0x40
+    if(data & 0x40)
+    {
+        cpu->p |= 0x40;
+    }
+    else
+    {
+        cpu->p &= ~0x40;
+    }
+
+    // negative flag set to bit 7 of the memory value
+    setnegflag(data, cpu);
+}

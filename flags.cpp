@@ -21,7 +21,7 @@ bool setzeroflag(uint8_t compval, cpustate * cpu)
 
 bool setnegflag(uint8_t compval, cpustate * cpu)
 {
-    // if bit 7 of accumulator is on, negative flag is set
+    // if bit 7 of compval is on, negative flag is set
     if(compval & 0x80)
     {
         cpu->p |= 1;
