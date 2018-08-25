@@ -28,7 +28,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     /*
      * todo: implement:
      * ROR, ASL, LSR, ROL
-     * EOR
+     * EOR (absolute x, absolute y, indirect x, indirect y)
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * DEY, DEX, DEC
      * CPY, CPX
@@ -300,6 +300,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4; // todo: +1 if page crossed
     };
 
+    // EOR zero page 0x45 (2, 3)
+    myasm = addopcode(&opmap, 0x45, "0x45 eor $");
+    opmap[0x45]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+
+        EOR(cpu, mem->readmem(zeropage(cpu, mem)));
+
+        cpu->pc += 2;
+        return 3;
+    };
+
     // PHA 0x48
     myasm = addopcode(&opmap, 0x48, "0x48 pha");
     opmap[0x48]->f = [cpu, mem, myasm]() {
@@ -308,6 +319,37 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 1;
         return 3;
+    };
+
+    // EOR immediate 0x49
+    myasm = addopcode(&opmap, 0x49, "0x49 eor #$");
+    opmap[0x49]->f = [cpu, mem, myasm]() {
+        uint8_t val = mem->readmem(cpu->pc + 1);
+        if (DEBUG) printf("\n%s%x\n", myasm, val);
+
+        cpu->pc += 2;
+        return 2;
+    };
+
+    // EOR absolute 0x4d (3, 4)
+    myasm = addopcode(&opmap, 0x4d, "0x4d eor $");
+    opmap[0x4d]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        EOR(cpu, mem->readmem(addr));
+
+        cpu->pc += 3;
+        return 4;
+    };
+
+    // EOR zero page,x 0x55 (2, 4)
+    myasm = addopcode(&opmap, 0x55, "0x55 eor $");
+    opmap[0x55]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,X\n",myasm,mem->readmem(cpu->pc+1));
+        EOR(cpu, mem->readmem(zeropagex(cpu, mem)));
+
+        cpu->pc += 2;
+        return 4;
     };
 
     // CLI 0x58
