@@ -28,7 +28,6 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     /*
      * todo: implement:
      * ROR, ASL, LSR, ROL
-     * EOR (absolute x, absolute y, indirect x, indirect y)
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * DEY, DEX, DEC
      * CPY, CPX
@@ -300,6 +299,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4; // todo: +1 if page crossed
     };
 
+    // EOR indirect,x 0x41
+    myasm = addopcode(&opmap, 0x41, "0x41 eor ($");
+    opmap[0x41]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
+        EOR(cpu, mem->readmem(indexedindirect(cpu, mem)));
+
+        cpu->pc += 2;
+        return 6;
+    };
+
     // EOR zero page 0x45 (2, 3)
     myasm = addopcode(&opmap, 0x45, "0x45 eor $");
     opmap[0x45]->f = [cpu, mem, myasm]() {
@@ -342,6 +351,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;
     };
 
+    // EOR indirect,y 0x51
+    myasm = addopcode(&opmap, 0x51, "0x51 eor ($");
+    opmap[0x51]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s%x),Y\n", myasm, mem->readmem(cpu->pc+1));
+        EOR(cpu, mem->readmem(indirectindexed(cpu, mem)));
+
+        cpu->pc += 2;
+        return 5;
+        // todo: +1 if page crossed
+    };
+
+
     // EOR zero page,x 0x55 (2, 4)
     myasm = addopcode(&opmap, 0x55, "0x55 eor $");
     opmap[0x55]->f = [cpu, mem, myasm]() {
@@ -364,11 +385,34 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 2;
     };
 
+    // EOR absolute,y 0x59
+    myasm = addopcode(&opmap, 0x59, "0x59 eor $");
+    opmap[0x59]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,Y\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        EOR(cpu, mem->readmem(absolutey(cpu, mem)));
+
+        cpu->pc += 3;
+        return 4;
+        // todo: +1 if page crossed
+    };
+
+    // EOR absolute,x 0x5d
+    myasm = addopcode(&opmap, 0x5d, "0x5d eor $");
+    opmap[0x5d]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        EOR(cpu, mem->readmem(absolutex(cpu, mem)));
+
+        cpu->pc += 3;
+        return 4;
+        // todo: +1 if page crossed
+    };
+
     // ADC indexed indirect
     myasm = addopcode(&opmap, 0x61, "0x61 adc ($");
     opmap[0x61]->f = [cpu, mem, myasm]() {
         if(DEBUG) printf("\n%s%x,X)\n", myasm, mem->readmem(cpu->pc+1));
-        adc(cpu, indexedindirect(cpu, mem));
+        // NOTE: this had been sending an address to ADC before adding readmem()
+        adc(cpu, mem->readmem(indexedindirect(cpu, mem)));
 
         cpu->pc += 2;
         return 6;
