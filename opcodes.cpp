@@ -30,8 +30,9 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * ROR, ASL, LSR, ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * DEY, DEX, DEC
-     * CPY, CPX
+     * CPY
      * CLV, CLD
+     * BRK
      */
     // http://obelisk.me.uk/6502/reference.html
 
@@ -1031,6 +1032,26 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;   // todo: +1 if page crossed
     };
 
+    // CPX immediate 0xe0
+    myasm = addopcode(&opmap, 0xe0, "0xe0 cpx #$");
+    opmap[0xe0]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        compare(cpu, mem, cpu->x, cpu->pc+1);
+
+        cpu->pc += 2;
+        return 2;
+    };
+
+    // CPX zero page 0xe4
+    myasm = addopcode(&opmap, 0xe4, "0xe4 cpx $");
+    opmap[0xe4]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        compare(cpu, mem, cpu->x, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+        return 3;
+    };
+
     /*
     SBC #$NN	Immediate	$e9	CZ- - - VN
     SBC $NNNN	Absolute	$ed	CZ- - - VN
@@ -1094,6 +1115,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 1;
         return 2;
+    };
+
+    // CPX absolute 0xec
+    myasm = addopcode(&opmap, 0xec, "0xec cpx $");
+    opmap[0xec]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));
+        if (DEBUG) printf("\n%s%x\n", myasm, addr);
+        compare(cpu, mem, cpu->x, addr);
+
+
+        cpu->pc += 3;
+        return 4;
     };
 
     // SBC absolute $ed
