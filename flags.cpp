@@ -6,8 +6,8 @@
 
 bool setzeroflag(uint8_t compval, cpustate * cpu)
 {
-    // if accumulator is 0, zero flag is set
-    if(!compval)
+    // if compval is 0, zero flag is set
+    if(compval == 0)
     {
         cpu->p |= (1 << 6);
         return true;

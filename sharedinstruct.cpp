@@ -174,9 +174,25 @@ void EOR(cpustate * cpu, uint8_t arg)
 }
 
 // Arithmetic Shift Left
-void asl()
+void asl(cpustate * cpu, uint8_t * val)
 {
+    /*
+     * uint8_t val: pointer to either the accumulator or a value read from memory
+     *
+     * flags (from MOS 6502 programming manual):
+     *      The instruction does not affect the overflow bit, sets N equal to the
+     *       result bit 7 (bit 6 in the input), sets Z flag if the result is equal to
+     *       0, otherwise resets Z and stores the input bit 7 in the carry flag.
+     */
 
+    // set carry flag to bit 7 of input value
+    cpu->p |= (*val & 0x80);
+
+    // bit shift
+    *val = *val << 1;
+
+    setzeroflag(*val, cpu);
+    setnegflag(*val, cpu);
 }
 
 // Logical Shift Right
@@ -202,6 +218,7 @@ void inc(cpustate * cpu, Memory * mem, uint16_t finaladdr)
         todo: unit test
      */
     uint8_t val = mem->readmem(finaladdr);
+    // todo: well this looks wrong
     if(val == 255)
     val++;
     mem->writemem(finaladdr, val);
