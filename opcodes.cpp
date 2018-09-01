@@ -30,7 +30,6 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * ROR, ASL, LSR, ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * DEY, DEX, DEC
-     * CPY
      * CLV, CLD
      * BRK
      */
@@ -932,6 +931,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         // todo: +1 if page crossed
     };
 
+    // CPY immediate 0xc0
+    myasm = addopcode(&opmap, 0xc0, "0xc0 cpy #$");
+    opmap[0xc0]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        compare(cpu, mem, cpu->y, cpu->pc+1);
+
+        cpu->pc += 2;
+        return 2;
+    };
+
     // CMP indirect,x 0xc1
     myasm = addopcode(&opmap, 0xc1, "0xc1 cmp ($");
     opmap[0xc1]->f = [cpu, mem, myasm]() {
@@ -941,6 +950,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 2;
         return 6;
     };
+
+    // CPY zero page 0xc4
+    myasm = addopcode(&opmap, 0xc4, "0xc4 cpy $");
+    opmap[0xc4]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc+1));
+        compare(cpu, mem, cpu->y, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+        return 3;
+    };
+
 
     // CMP zero page 0xc5
     myasm = addopcode(&opmap, 0xc5, "0xc5 cmp $");
@@ -979,13 +999,23 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 2;
     };
 
+    // CPY absolute 0xcc
+    myasm = addopcode(&opmap, 0xcc, "0xcc cpy $");
+    opmap[0xcc]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));
+        if (DEBUG) printf("\n%s%x\n", myasm, addr);
+        compare(cpu, mem, cpu->y, addr);
+
+        cpu->pc += 3;
+        return 4;
+    };
+
     // CMP absolute 0xcd
     myasm = addopcode(&opmap, 0xcd, "0xcd cmp $");
     opmap[0xcd]->f = [cpu, mem, myasm]() {
         uint16_t addr = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));
         if (DEBUG) printf("\n%s%x\n", myasm, addr);
         compare(cpu, mem, cpu->a, addr);
-
 
         cpu->pc += 3;
         return 4;
