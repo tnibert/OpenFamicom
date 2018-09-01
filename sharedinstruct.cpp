@@ -232,8 +232,7 @@ void inc(cpustate * cpu, Memory * mem, uint16_t finaladdr)
         todo: unit test
      */
     uint8_t val = mem->readmem(finaladdr);
-    // todo: well this looks wrong
-    if(val == 255)
+    // removed check for val == 255, I think it will just roll around to zero again?
     val++;
     mem->writemem(finaladdr, val);
 
