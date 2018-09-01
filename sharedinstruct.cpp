@@ -196,9 +196,23 @@ void asl(cpustate * cpu, uint8_t * val)
 }
 
 // Logical Shift Right
-void lsr()
+void lsr(cpustate * cpu, uint8_t * val)
 {
+    // set carry flag to bit 0 of input value
+    if(*val & 0x1)
+    {
+        cpu->p |= 0x80;
+    }
+    else
+    {
+        cpu->p &= ~0x80;
+    }
 
+    // bit shift
+    *val = *val >> 1;
+
+    setzeroflag(*val, cpu);
+    setnegflag(*val, cpu);
 }
 
 // Rotate Right
