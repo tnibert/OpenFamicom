@@ -320,6 +320,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
+    // LSR zero page 0x46
+    myasm = addopcode(&opmap, 0x46, "0x46 lsr $");
+    opmap[0x46]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        lsrmem(cpu, mem, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+        return 5;
+    };
+
     // PHA 0x48
     myasm = addopcode(&opmap, 0x48, "0x48 pha");
     opmap[0x48]->f = [cpu, mem, myasm]() {
@@ -337,6 +347,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         if (DEBUG) printf("\n%s%x\n", myasm, val);
 
         cpu->pc += 2;
+        return 2;
+    };
+
+    // LSR accumulator 0x4a
+    myasm = addopcode(&opmap, 0x4a, "0x4a lsr A");
+    opmap[0x4a]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        lsra(cpu, &cpu->a);
+
+        cpu->pc += 1;
         return 2;
     };
 

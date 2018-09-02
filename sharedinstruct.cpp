@@ -196,10 +196,10 @@ void asl(cpustate * cpu, uint8_t * val)
 }
 
 // Logical Shift Right
-void lsr(cpustate * cpu, uint8_t * val)
+uint8_t _lsr(cpustate * cpu, uint8_t val)
 {
     // set carry flag to bit 0 of input value
-    if(*val & 0x1)
+    if(val & 0x1)
     {
         cpu->p |= 0x80;
     }
@@ -209,10 +209,28 @@ void lsr(cpustate * cpu, uint8_t * val)
     }
 
     // bit shift
-    *val = *val >> 1;
+    val = val >> 1;
 
-    setzeroflag(*val, cpu);
-    setnegflag(*val, cpu);
+    setzeroflag(val, cpu);
+    setnegflag(val, cpu);
+
+    return val;
+}
+
+// LSR for accumulator
+void lsra(cpustate * cpu, uint8_t * val)
+{
+    *val = _lsr(cpu, *val);
+}
+
+// LSR for memory address
+void lsrmem(cpustate * cpu, Memory * mem, uint16_t addr)
+{
+    uint8_t val = mem->readmem(addr);
+
+    val = _lsr(cpu, val);
+
+    mem->writemem(addr, val);
 }
 
 // Rotate Right
