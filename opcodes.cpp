@@ -27,7 +27,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 {
     /*
      * todo: implement:
-     * ROR, ASL, LSR, ROL
+     * ROR, ASL, ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * DEY, DEX, DEC
      * CLV, CLD
@@ -371,6 +371,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;
     };
 
+    // LSR absolute 0x4e (3,6)
+    myasm = addopcode(&opmap, 0x4e, "0x4e lsr $");
+    opmap[0x4e]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        lsrmem(cpu, mem, addr);
+
+        cpu->pc += 3;
+        return 6;
+    };
+
     // EOR indirect,y 0x51
     myasm = addopcode(&opmap, 0x51, "0x51 eor ($");
     opmap[0x51]->f = [cpu, mem, myasm]() {
@@ -391,6 +402,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 4;
+    };
+
+    // LSR zero page,x 0x56 (2,6)
+    myasm = addopcode(&opmap, 0x56, "0x56 lsr $");
+    opmap[0x56]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, mem->readmem(cpu->pc + 1));
+        lsrmem(cpu, mem, zeropagex(cpu, mem));
+
+        cpu->pc += 2;
+        return 6;
     };
 
     // CLI 0x58
@@ -425,6 +446,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 3;
         return 4;
         // todo: +1 if page crossed
+    };
+
+    // LSR absolute,x 0x5e (3,7)
+    myasm = addopcode(&opmap, 0x5e, "0x5e lsr $");
+    opmap[0x5e]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        lsrmem(cpu, mem, absolutex(cpu, mem));
+
+        cpu->pc += 3;
+        return 7;
     };
 
     // ADC indexed indirect
