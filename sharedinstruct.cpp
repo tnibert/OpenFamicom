@@ -174,7 +174,7 @@ void EOR(cpustate * cpu, uint8_t arg)
 }
 
 // Arithmetic Shift Left
-void asl(cpustate * cpu, uint8_t * val)
+uint8_t _asl(cpustate * cpu, uint8_t val)
 {
     /*
      * uint8_t val: pointer to either the accumulator or a value read from memory
@@ -186,13 +186,31 @@ void asl(cpustate * cpu, uint8_t * val)
      */
 
     // set carry flag to bit 7 of input value
-    cpu->p |= (*val & 0x80);
+    cpu->p |= (val & 0x80);
 
     // bit shift
-    *val = *val << 1;
+    val = val << 1;
 
-    setzeroflag(*val, cpu);
-    setnegflag(*val, cpu);
+    setzeroflag(val, cpu);
+    setnegflag(val, cpu);
+
+    return val;
+}
+
+// ASL for accumulator
+void asla(cpustate * cpu, uint8_t * val)
+{
+    *val = _asl(cpu, *val);
+}
+
+// ASL for memory address
+void aslmem(cpustate * cpu, Memory * mem, uint16_t addr)
+{
+    uint8_t val = mem->readmem(addr);
+
+    val = _asl(cpu, val);
+
+    mem->writemem(addr, val);
 }
 
 // Logical Shift Right

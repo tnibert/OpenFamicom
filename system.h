@@ -125,6 +125,8 @@ uint8_t pop(cpustate *, Memory *);
 void bit(cpustate *, Memory *, uint16_t);
 void lsra(cpustate *, uint8_t *);
 void lsrmem(cpustate *, Memory *, uint16_t);
+void asla(cpustate *, uint8_t *);
+void aslmem(cpustate *, Memory *, uint16_t);
 
 // addressing modes
 uint16_t indexedindirect(cpustate *, Memory *);
