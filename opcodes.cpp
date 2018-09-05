@@ -87,6 +87,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
+    // ASL zero page 0x06
+    myasm = addopcode(&opmap, 0x6, "0x06 asl $");
+    opmap[0x6]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        aslmem(cpu, mem, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+        return 5;
+    };
+
     // PHP 0x08
     myasm = addopcode(&opmap, 0x8, "0x08 php");
     opmap[0x8]->f = [cpu, mem, myasm]() {
@@ -104,6 +114,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         ORA(cpu, mem->readmem(cpu->pc+1));
 
         cpu->pc += 2;
+        return 2;
+    };
+
+    // ASL accumulator 0x0a (1, 2)
+    myasm = addopcode(&opmap, 0x4a, "0x0a asl A");
+    opmap[0xa]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        asla(cpu, &cpu->a);
+
+        cpu->pc += 1;
         return 2;
     };
 
