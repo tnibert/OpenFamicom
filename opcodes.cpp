@@ -30,7 +30,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * ROR, ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * DEY, DEX, DEC
-     * CLV, CLD
+     * CLD
      * BRK
      */
     // http://obelisk.me.uk/6502/reference.html
@@ -976,6 +976,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 4;
+    };
+
+    // CLV 0xb8
+    myasm = addopcode(&opmap, 0xb8, "0xb8 clv");
+    opmap[0xb8]->f = [cpu, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        // clear oVerflow flag
+        cpu->p &= ~(1 << 1);
+
+        cpu->pc += 1;
+        return 2;
     };
 
     // LDA absolute,Y
