@@ -30,7 +30,6 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * ROR, ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * DEY, DEX, DEC
-     * CLD
      * BRK
      */
     // http://obelisk.me.uk/6502/reference.html
@@ -1154,6 +1153,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 4;
+    };
+
+    // CLD 0xd8
+    // clear decimal mode flag
+    myasm = addopcode(&opmap, 0xd8, "0xd8 cld");
+    opmap[0xd8]->f = [cpu, myasm] () {
+        if (DEBUG) printf("\n%s\n", myasm);
+        cpu->p &= ~(1 << 3);
+
+        cpu->pc += 1;
+        return 2;
     };
 
     // CMP absolute,y 0xd9
