@@ -279,6 +279,34 @@ void inc(cpustate * cpu, Memory * mem, uint16_t finaladdr)
     setnegflag(val, cpu);
 }
 
+uint8_t _dec(cpustate * cpu, uint8_t val)
+{
+    /*
+        Used for DEC, DEX, DEY
+        Decrement and set flags
+    */
+    val--;
+
+    setzeroflag(val, cpu);
+    setnegflag(val, cpu);
+    return val;
+}
+
+void decmem(cpustate * cpu, Memory * mem, uint16_t addr)
+{
+    // for DEC
+    uint8_t val = mem->readmem(addr);
+    val = _dec(cpu, val);
+    mem->writemem(addr, val);
+}
+
+void decreg(spustate * cpu, uint8_t &reg)
+{
+    // for DEX, DEY
+    // call like: decreg(cpu, &cpu->x);
+    *reg = _dec(cpu, *reg);
+}
+
 void compare(cpustate * cpu, Memory * mem, uint8_t reg, uint16_t addr)
 {
     /*
