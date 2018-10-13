@@ -300,10 +300,11 @@ void decmem(cpustate * cpu, Memory * mem, uint16_t addr)
     mem->writemem(addr, val);
 }
 
-void decreg(spustate * cpu, uint8_t &reg)
+void decreg(cpustate * cpu, uint8_t * reg)
 {
     // for DEX, DEY
     // call like: decreg(cpu, &cpu->x);
+    // http://faculty.cs.niu.edu/~mcmahon/CS241/Notes/pass_by_address.html
     *reg = _dec(cpu, *reg);
 }
 

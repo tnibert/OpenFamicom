@@ -29,7 +29,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * todo: implement:
      * ROR, ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
-     * DEY, DEX, DEC
+     * DEX, DEC
      * BRK
      */
     // http://obelisk.me.uk/6502/reference.html
@@ -657,6 +657,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 3;
+    };
+
+    // DEY 0x88
+    myasm = addopcode(&opmap, 0x88, "0x88 dey");
+    opmap[0x88]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        decreg(cpu, &cpu->y);
+
+        cpu->pc += 1;
+        return 2;
     };
 
     // TXA 0x8a
