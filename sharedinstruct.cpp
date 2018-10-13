@@ -295,6 +295,7 @@ uint8_t _dec(cpustate * cpu, uint8_t val)
 void decmem(cpustate * cpu, Memory * mem, uint16_t addr)
 {
     // for DEC
+    // uint16_t addr: final address of memory
     uint8_t val = mem->readmem(addr);
     val = _dec(cpu, val);
     mem->writemem(addr, val);

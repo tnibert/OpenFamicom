@@ -1,5 +1,19 @@
 #include "system.h"
 
+/*
+ * https://ascii.cl/conversion.htm
+ * Well... I think this is fundamentally flawed now...
+ * If I'm correct:
+ * Each opcode is a byte, composed of 8 bits.
+ * This byte is the input to the processor, and each bit goes to a different unit of the processor
+ * Therefore something like changing from addressing mode zero page to zero page,x
+ * would be as simple as turning on the fifth bit in 11000110 to get 11010110 (0xC6 to 0xD6)
+ *
+ * I might be totally wrong, but that would make sense... need to look at the opcode relationships
+ * They seem to have relationships to each other where they do things like increase by 8 or f
+ * Hmmmmmm
+ */
+
 opcode::opcode(uint8_t ocode, const char * ocodestr)
 {
     code = ocode;
@@ -29,7 +43,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * todo: implement:
      * ROR, ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
-     * DEX, DEC
+     * DEC
      * BRK
      */
     // http://obelisk.me.uk/6502/reference.html
@@ -1095,6 +1109,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
+    // DEC zero page 0xc6
+    // you know, I'm having a thought here... this all could probably be done with macros pretty well, but that probably has it's own problems
+    myasm = addopcode(&opmap, 0xc6, "0xc6 dec $");
+    opmap[0xc6]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        decmem(cpu, mem, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+        return 5;
+    };
+
+
     // INY 0xc8
     myasm = addopcode(&opmap, 0xc8, "0xc8 iny");
     opmap[0xc8]->f = [cpu, myasm]() {
@@ -1173,6 +1199,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 4;
+    };
+
+    // DEC zero page,x (2, 6) 0xd6
+    myasm = addopcode(&opmap, 0xd6, "0xd6 dec $");
+    opmap[0xd6]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, mem->readmem(cpu->pc+1));
+        decmem(cpu, mem, zeropagex(cpu, mem));
+
+        cpu->pc += 2;
+        return 6;
     };
 
     // CLD 0xd8
