@@ -1122,6 +1122,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 2;
     };
 
+    // DEX 0xca
+    myasm = addopcode(&opmap, 0xca, "0xca dex");
+    opmap[0xca]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        decreg(cpu, &cpu->x);
+
+        cpu->pc += 1;
+        return 2;
+    };
+
     // CPY absolute 0xcc
     myasm = addopcode(&opmap, 0xcc, "0xcc cpy $");
     opmap[0xcc]->f = [cpu, mem, myasm]() {
