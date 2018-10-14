@@ -43,7 +43,6 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * todo: implement:
      * ROR, ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
-     * DEC
      * BRK
      */
     // http://obelisk.me.uk/6502/reference.html
@@ -1180,6 +1179,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;
     };
 
+    // DEC absolute 0xce (3, 6)
+    myasm = addopcode(&opmap, 0xce, "0xce dec $");
+    opmap[0xce]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));
+        if (DEBUG) printf("\n%s%x\n", myasm, addr);
+        decmem(cpu, mem, addr);
+
+        cpu->pc += 3;
+        return 6;
+    };
+
     // CMP indirect,y 0xd1
     myasm = addopcode(&opmap, 0xd1, "0xd1 cmp ($");
     opmap[0xd1]->f = [cpu, mem, myasm]() {
@@ -1240,6 +1250,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 3;
         return 4;   // todo: +1 if page crossed
+    };
+
+    // DEC absolute,x 0xde (3, 7)
+    myasm = addopcode(&opmap, 0xde, "0xde dec $");
+    opmap[0xde]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        decmem(cpu, mem, absolutex(cpu, mem));
+
+        cpu->pc += 3;
+        return 7;
     };
 
     // CPX immediate 0xe0
