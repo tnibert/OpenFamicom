@@ -44,8 +44,11 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
      * ROR, ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * BRK
+     * RTI, RTS
      */
     // http://obelisk.me.uk/6502/reference.html
+    // http://nesdev.com/6502.txt
+    // http://www.6502.org/tutorials/6502opcodes.html
 
     std::map<uint8_t, std::shared_ptr<opcode> > opmap;
     const char * myasm;
@@ -362,6 +365,8 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 3;
         return 4; // todo: +1 if page crossed
     };
+
+    // RTI 0x40
 
     // EOR indirect,x 0x41
     myasm = addopcode(&opmap, 0x41, "0x41 eor ($");

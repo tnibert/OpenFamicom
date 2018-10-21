@@ -216,6 +216,11 @@ void aslmem(cpustate * cpu, Memory * mem, uint16_t addr)
 // Logical Shift Right
 uint8_t _lsr(cpustate * cpu, uint8_t val)
 {
+    /*
+     * "LSR shifts all bits right one position. 0 is shifted into bit 7 and the original bit 0 is shifted into the Carry."
+     * http://www.6502.org/tutorials/6502opcodes.html#LSR
+     */
+
     // set carry flag to bit 0 of input value
     if(val & 0x1)
     {
@@ -251,12 +256,75 @@ void lsrmem(cpustate * cpu, Memory * mem, uint16_t addr)
     mem->writemem(addr, val);
 }
 
-// Rotate Right
-void ror()
-{
+/*
+ * difference between LSR and ROR:
+ * "LSR and ROR both shift their argument to the right, but LSR makes the MSB of counter_hi 0 and shifts the LSB of
+ * counter_hi into the carry flag, while ROR makes the MSB of counter_lo equal to the (old) LSB of counter_hi."
+ *
+ * This is quite confusing... but I think I follow now
+ *  todo: watch out for the bit shift opcodes causing problems, what is not understood WILL be the source of issues
+ *
+ *  MSB == Most Significant Bit
+ *  This is the left most bit and I *think* it is what the docs mean by bit 7.
+ */
 
+// Rotate Right
+uint8_t _ror(cpustate * cpu, uint8_t val)
+{
+    // Move each of the bits in either A or M one place to the right. Bit 7 is filled with the current value of the carry flag whilst the old bit 0 becomes the new carry flag value.
+    /*
+     * "ROR shifts all bits right one position. The Carry is shifted into bit 7 and the original bit 0 is shifted into the Carry."
+     * http://www.6502.org/tutorials/6502opcodes.html#ROR
+     */
+    // store old carry flag value <- store and restore of carry flag is the difference between ror and lsr in emulation
+    uint8_t oldcarry = (cpu->p & 0x80);     // this statement will either evaluate to 0 or 0x80 e.g. 0b10000000
+
+    // old bit 0 becomes new carry flag value:
+    if(val & 0x1)
+    {
+        cpu->p |= 0x80;
+    }
+    else
+    {
+        cpu->p &= ~0x80;
+    }
+
+    // Move each of the bits one place to the right
+    val = val >> 1;
+
+    // Bit 7 is filled with original value of the carry flag
+    val |= oldcarry;
+
+    // set flags
+    // obelisk.me.uk says to set the zero flag if A = 0, I think it is probably wrong and is the result instead.
+    // todo: verify this in the documentation
+    setzeroflag(val, cpu);
+    setnegflag(val, cpu);
+
+    return val;
 }
 
+// ROR for accumulator
+void rora(cpustate * cpu, uint8_t * val)
+{
+    *val = _ror(cpu, *val);
+}
+
+// ROR for memory address
+void rormem(cpustate * cpu, Memory * mem, uint16_t addr)
+{
+    uint8_t val = mem->readmem(addr);
+
+    val = _ror(cpu, val);
+
+    mem->writemem(addr, val);
+}
+
+// Rotate Left
+uint8_t _rol()
+{
+    // Move each of the bits in either A or M one place to the left. Bit 0 is filled with the current value of the carry flag whilst the old bit 7 becomes the new carry flag value.
+}
 
 void inc(cpustate * cpu, Memory * mem, uint16_t finaladdr)
 {
