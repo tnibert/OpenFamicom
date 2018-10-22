@@ -538,6 +538,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 6;
     };
 
+    // ROR zero page 0x66 (2, 5)
+    myasm = addopcode(&opmap, 0x66, "0x66 ror $");
+    opmap[0x66]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        rormem(cpu, mem, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+        return 5;
+    };
+
     // ADC zero page
     myasm = addopcode(&opmap, 0x65, "0x65 adc $");
     opmap[0x65]->f = [cpu, mem, myasm]() {
@@ -571,6 +581,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 2;
     };
 
+    // ROR accumulator 0x6a
+    myasm = addopcode(&opmap, 0x6a, "0x6a ror A");
+    opmap[0x6a]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        rora(cpu, &cpu->a);
+
+        cpu->pc += 1;
+        return 2;
+    };
+
     // ADC absolute $6d
     myasm = addopcode(&opmap, 0x6d, "0x6d adc $");
     opmap[0x6d]->f = [cpu, mem, myasm]() {
@@ -601,6 +621,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 4;
+    };
+
+    // ROR zero page,x 0x76 (2,6)
+    myasm = addopcode(&opmap, 0x76, "0x76 ror $");
+    opmap[0x76]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, mem->readmem(cpu->pc + 1));
+        rormem(cpu, mem, zeropagex(cpu, mem));
+
+        cpu->pc += 2;
+        return 6;
     };
 
     // SEI 0x78
