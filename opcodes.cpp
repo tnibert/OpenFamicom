@@ -41,7 +41,7 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 {
     /*
      * todo: implement:
-     * ROR, ROL
+     * ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * BRK
      * RTI, RTS
@@ -538,6 +538,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 6;
     };
 
+    // ROR absolute 0x6e (3,6)
+    myasm = addopcode(&opmap, 0x4e, "0x4e lsr $");
+    opmap[0x4e]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        lsrmem(cpu, mem, addr);
+
+        cpu->pc += 3;
+        return 6;
+    };
+
     // ROR zero page 0x66 (2, 5)
     myasm = addopcode(&opmap, 0x66, "0x66 ror $");
     opmap[0x66]->f = [cpu, mem, myasm]() {
@@ -602,6 +613,18 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;
     };
 
+    //  ROR absolute 0x6e 3, 6
+    myasm = addopcode(&opmap, 0x6e, "0x6e ror $");
+    opmap[0x6e]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        rormem(cpu, mem, addr);
+
+        cpu->pc += 3;
+        return 6;
+    };
+
+
     // ADC indirect indexed $71
     myasm = addopcode(&opmap, 0x71, "0x71 adc ($");
     opmap[0x71]->f = [cpu, mem, myasm]() {
@@ -665,6 +688,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         cpu->pc += 3;
         return 4;
         // todo: +1 if page crossed
+    };
+
+    // ROR absolute,x 0x7e
+    myasm = addopcode(&opmap, 0x7e, "0x7e ror $");
+    opmap[0x7e]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        rormem(cpu, mem, absolutex(cpu, mem));
+
+        cpu->pc += 3;
+        return 7;
     };
 
     // STA indexed indirect
