@@ -298,6 +298,10 @@ uint8_t _ror(cpustate * cpu, uint8_t val)
     // set flags
     // obelisk.me.uk says to set the zero flag if A = 0, I think it is probably wrong and is the result instead.
     // todo: verify this in the documentation
+    // from the official 6502 programming manual - seems I'm right:
+    // The ROR instruction sets carry equal to input bit 0, sets N
+    // equal to the input carry and sets the Z flag if the result of the rotate is 0
+    // otherwise it resets Z and does not affect the overflow flag at all.
     setzeroflag(val, cpu);
     setnegflag(val, cpu);
 
@@ -321,9 +325,49 @@ void rormem(cpustate * cpu, Memory * mem, uint16_t addr)
 }
 
 // Rotate Left
-uint8_t _rol()
+uint8_t _rol(cpustate * cpu, uint8_t val)
 {
     // Move each of the bits in either A or M one place to the left. Bit 0 is filled with the current value of the carry flag whilst the old bit 7 becomes the new carry flag value.
+    // This isn't so bad, highest bit (bit 7) moves to carry, carry moves to lowest bit (bit 0)
+
+    uint8_t oldcarry = (cpu->p & 0x80);     // this statement will either evaluate to 0 or 0x80 e.g. 0b10000000
+    oldcarry = oldcarry >> 7;               // shift the old carry from bit 7 to bit 0, to align with new placement in val
+
+    // old bit 7 becomes new carry flag value:
+    if(val & 0x80)
+    {
+        cpu->p |= 0x80;
+    }
+    else
+    {
+        cpu->p &= ~0x80;
+    }
+
+    // Move each of the bits one place to the left
+    val = val << 1;
+
+    // Bit 0 is filled with original value of the carry flag
+    val |= oldcarry;
+
+    // set flags
+    setzeroflag(val, cpu);
+    setnegflag(val, cpu);
+
+    return val;
+}
+
+void rola(cpustate * cpu, uint8_t * val)
+{
+    *val = _ror(cpu, *val);
+}
+
+void rolmem(cpustate * cpu, Memory * mem, uint16_t addr)
+{
+    uint8_t val = mem->readmem(addr);
+
+    val = _rol(cpu, val);
+
+    mem->writemem(addr, val);
 }
 
 void inc(cpustate * cpu, Memory * mem, uint16_t finaladdr)

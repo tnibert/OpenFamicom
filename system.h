@@ -129,6 +129,8 @@ void asla(cpustate *, uint8_t *);
 void aslmem(cpustate *, Memory *, uint16_t);
 void rora(cpustate *, uint8_t *);
 void rormem(cpustate *, Memory *, uint16_t);
+void rola(cpustate *, uint8_t *);
+void rolmem(cpustate *, Memory *, uint16_t);
 
 void decreg(cpustate *, uint8_t *);
 void decmem(cpustate *, Memory *, uint16_t);
