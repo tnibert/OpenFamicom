@@ -270,6 +270,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 3;
     };
 
+    // ROL zero page 0x26 (2, 5)
+    myasm = addopcode(&opmap, 0x26, "0x26 rol $");
+    opmap[0x26]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x\n", myasm, mem->readmem(cpu->pc + 1));
+        rolmem(cpu, mem, zeropage(cpu, mem));
+
+        cpu->pc += 2;
+        return 5;
+    };
+
     // PLP 0x28
     myasm = addopcode(&opmap, 0x28, "0x28 plp");
     opmap[0x28]->f = [cpu, mem, myasm]() {
@@ -288,6 +298,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         AND(cpu, mem->readmem(cpu->pc+1));
 
         cpu->pc += 2;
+        return 2;
+    };
+
+    // ROL accumulator 0x2a
+    myasm = addopcode(&opmap, 0x2a, "0x2a rol A");
+    opmap[0x2a]->f = [cpu, mem, myasm]() {
+        if(DEBUG) printf("\n%s\n", myasm);
+        rola(cpu, &cpu->a);
+
+        cpu->pc += 1;
         return 2;
     };
 
@@ -313,6 +333,17 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
         return 4;
     };
 
+    // ROL absolute 0x2e
+    myasm = addopcode(&opmap, 0x2e, "0x2e rol $");
+    opmap[0x2e]->f = [cpu, mem, myasm]() {
+        uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
+        if(DEBUG) printf("\n%s%x\n", myasm, addr);
+        rolmem(cpu, mem, addr);
+
+        cpu->pc += 3;
+        return 6;
+    };
+
     // AND indirect,y 0x31
     myasm = addopcode(&opmap, 0x31, "0x31 and ($");
     opmap[0x31]->f = [cpu, mem, myasm]() {
@@ -332,6 +363,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 2;
         return 4;
+    };
+
+    // ROL zero page,x 0x36 (2, 6)
+    myasm = addopcode(&opmap, 0x36, "0x36 rol $");
+    opmap[0x36]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, mem->readmem(cpu->pc + 1));
+        rolmem(cpu, mem, zeropagex(cpu, mem));
+
+        cpu->pc += 2;
+        return 6;
     };
 
     // SEC 0x38
@@ -364,6 +405,16 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
         cpu->pc += 3;
         return 4; // todo: +1 if page crossed
+    };
+
+    // ROL absolute,x 0x3e
+    myasm = addopcode(&opmap, 0x3e, "0x3e rol $");
+    opmap[0x3e]->f = [cpu, mem, myasm]() {
+        if (DEBUG) printf("\n%s%x,X\n", myasm, revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+        rolmem(cpu, mem, absolutex(cpu, mem));
+
+        cpu->pc += 3;
+        return 7;
     };
 
     // RTI 0x40
@@ -539,11 +590,11 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
     };
 
     // ROR absolute 0x6e (3,6)
-    myasm = addopcode(&opmap, 0x4e, "0x4e lsr $");
-    opmap[0x4e]->f = [cpu, mem, myasm]() {
+    myasm = addopcode(&opmap, 0x6e, "0x6e ror $");
+    opmap[0x6e]->f = [cpu, mem, myasm]() {
         uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1),mem->readmem(cpu->pc+2));
         if(DEBUG) printf("\n%s%x\n", myasm, addr);
-        lsrmem(cpu, mem, addr);
+        rormem(cpu, mem, addr);
 
         cpu->pc += 3;
         return 6;
