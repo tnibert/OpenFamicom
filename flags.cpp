@@ -2,6 +2,18 @@
 
 /*
  * setter functions return true or false based on whether flag was set or not
+ *
+ * order of flags:
+ *      Bit No.    7   6   5   4   3   2   1   0
+                   S   V       B   D   I   Z   C
+        S = Sign = Negative
+        V = oVerflow
+        bit 5 is always set to one
+        B = break flag
+        D = decimal flag (not used in NES)
+        I = interrupt
+        Z = zero
+        C = carry
  */
 
 bool setzeroflag(uint8_t compval, cpustate * cpu)

@@ -14,6 +14,9 @@
  * Hmmmmmm
  */
 
+// todo: !!! I have made a very erroneous assumption about the carry flag - it is bit 0, not bit 7
+// todo: go back and change every access to carry flag... fuck
+
 opcode::opcode(uint8_t ocode, const char * ocodestr)
 {
     code = ocode;
@@ -41,7 +44,6 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 {
     /*
      * todo: implement:
-     * ROL
      * JSR, JMP, BVS, BVC, BPL, BNE, BMI, BEQ, BCS, BCC - jumping and branching, last to do
      * BRK
      * RTI, RTS
@@ -73,10 +75,24 @@ std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate * cpu, Me
 
     // BRK
     myasm = addopcode(&opmap, 0x00, "0x00 BRK");
-    opmap[0x00]->f = [cpu, myasm]() {
+    opmap[0x00]->f = [cpu, mem, myasm]() {
         printf("\n%s\n", myasm);
+        
+        // The BRK instruction forces the generation of an interrupt request.
+        // The program counter and processor status are pushed on the stack then
+        // the IRQ interrupt vector at $FFFE/F is loaded into the PC and the break flag in the status set to one.
 
-        // todo: generates interrupts, implement properly
+        // push program counter and processor status to stack
+        // todo: but in what order?
+        push(cpu, mem, cpu->pc);
+        push(cpu, mem, cpu->p);
+
+        // set memory location $FFFE/F to program counter
+        // todo: do these bytes need to be reversed for endianness?
+        cpu->pc = (mem->readmem(0xfffe) << 8) | mem->readmem(0xffff);
+
+        // set break flag
+        cpu->p |= 1 << 4;
 
         cpu->pc += 1;
         return 7;
