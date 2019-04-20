@@ -21,6 +21,9 @@
 
 #define DEBUG 1
 
+// todo: split this file into multiple headers
+// todo: this needs a general organization refactor, not intuitive where things are
+
 // class for instructions
 class opcode
 {
@@ -105,6 +108,8 @@ class Famicom {
 };
 
 uint16_t revlendianbytes(uint8_t, uint8_t);
+
+cpustate * initcpu();
 
 std::map<uint8_t, std::shared_ptr<opcode> > create_opcode_map(cpustate *, Memory *);
 

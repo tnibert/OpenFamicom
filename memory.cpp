@@ -30,6 +30,13 @@
     $0200-$02FF	256 bytes	Data to be copied to OAM during next vertical blank
     $0300-$03FF	256 bytes	Variables used by sound player, and possibly other variables
     $0400-$07FF	1024 bytes	Arrays and less-often-accessed global variables
+
+    From official 6502 programming manual:
+    Locations FFFA through FFFF are reserved for vector pointers for the micro­
+    processor.
+    Into these locations are stored respectively the interrupt
+    vectors or pointers for: non-maskable interrupt, reset and interrupt
+    request.
 */
 
 Memory::Memory()

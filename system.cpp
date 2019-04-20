@@ -9,15 +9,7 @@ Famicom::Famicom(unsigned char * rom) {
     using namespace std;
     cout << "Famicom object is being created" << endl;
 
-    // initialize cpu state
-    cpu = (cpustate *)calloc(1, sizeof(cpustate));
-    cpu->pc = PRGROMSTART;                         // may not start at 0
-    // todo: verify all initial values
-    cpu->a = 0;
-    cpu->x = 0;
-    cpu->y = 0;
-    cpu->p = 0x34;      // processor status flags
-    cpu->sp = 0xfd;
+    cpu = initcpu();
 
     // initialize cartridge
     cart = new Cartridge(rom);
@@ -39,4 +31,19 @@ uint16_t revlendianbytes(uint8_t lsig, uint8_t msig)
      */
     uint16_t offset = (msig<<8) | (lsig);
     return offset;
+}
+
+cpustate * initcpu()
+{
+    // initialize cpu state
+    cpustate * cpu = (cpustate *)calloc(1, sizeof(cpustate));
+    cpu->pc = PRGROMSTART;                         // may not start at 0
+    // todo: verify all initial values
+    cpu->a = 0;
+    cpu->x = 0;
+    cpu->y = 0;
+    cpu->p = 0x34;      // processor status flags
+    cpu->sp = 0xfd;
+
+    return cpu;
 }
