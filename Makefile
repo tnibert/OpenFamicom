@@ -5,4 +5,4 @@ all:
 	g++ $(OBJS) -g -O0 -Wall -std=c++11 -o OpenFamicom
 
 test:
-	g++ $(TESTOBJS) -std=c++11 -o TestOpenFamicom
+	g++ $(TESTOBJS) -std=c++11 -lcppunit -o TestOpenFamicom

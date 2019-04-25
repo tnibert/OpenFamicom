@@ -44,7 +44,7 @@ class TestOpCodes : public CppUnit::TestFixture
             suiteOfTests->addTest(new TestCaller <TestOpCodes> ("test_ORA_0x01", &TestOpCodes::test_ORA_0x01_indirect_x));
             return suiteOfTests;
         }
-        void tearDown(void);
+        //void tearDown(void);
 
         void test_ORA_0x01_indirect_x()
         {
