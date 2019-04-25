@@ -17,22 +17,14 @@
 using namespace CppUnit;
 using namespace std;
 
-// http://cppunit.sourceforge.net/doc/lastest/cppunit_cookbook.html
 
-void TestOpCodes::setUp(void)
+int main(int argc, char* argv[])
 {
-    // initialize cpu state
-    cpu = initcpu();
-
-    // create memory map
-    memory = new Memory();
-
-    opmap = create_opcode_map(cpu, memory);
+    // ok, this is running the test twice, I have no idea why :\
+    cout << "check";
+    CppUnit::TextUi::TestRunner runner;
+    CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
+    runner.addTest( registry.makeTest() );
+    bool wasSuccessful = runner.run();
+    return !wasSuccessful;
 }
-
-void TestOpCodes::test_ORA_0x01_indirect_x()
-{
-    opmap[0x01]->f();
-    CPPUNIT_ASSERT(false);
-}
-
