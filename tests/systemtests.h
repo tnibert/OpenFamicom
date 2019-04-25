@@ -2,7 +2,8 @@
 #define OPENNES_SYSTEMTESTS_H
 
 #include "../system.h"
-/*
+#include <cppunit/extensions/HelperMacros.h>
+
 #include <cppunit/TestCase.h>
 #include <cppunit/TestFixture.h>
 #include <cppunit/ui/text/TextTestRunner.h>
@@ -15,8 +16,6 @@
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/XmlOutputter.h>
-*/
-#include <cppunit/extensions/HelperMacros.h>
 
 class TestOpCodes : public CppUnit::TestFixture
 {
@@ -36,6 +35,23 @@ class TestOpCodes : public CppUnit::TestFixture
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestOpCodes );
+
+class TestBasicCPUOperations : public CppUnit::TestFixture
+{
+    CPPUNIT_TEST_SUITE( TestBasicCPUOperations );
+    CPPUNIT_TEST( test_ORA );
+    CPPUNIT_TEST_SUITE_END();
+
+    private:
+        cpustate * cpu;
+    public:
+        void setUp(void);
+        //static CppUnit::Test *suite();
+
+        void test_ORA();
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( TestBasicCPUOperations );
 
 #endif //OPENNES_SYSTEMTESTS_H
 
