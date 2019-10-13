@@ -157,6 +157,7 @@ void AND(cpustate * cpu, uint8_t arg)
     setnegflag(cpu->a, cpu);
 }
 
+// todo: there is a type mismatch here
 void ORA(cpustate * cpu, uint8_t arg)
 {
     cpu->a = cpu->a | arg;

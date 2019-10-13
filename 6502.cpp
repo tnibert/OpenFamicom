@@ -21,3 +21,4 @@ uint16_t Famicom::getpc()
 {
     return cpu->pc;
 }
+

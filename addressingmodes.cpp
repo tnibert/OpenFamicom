@@ -7,7 +7,12 @@
  * Take arguments of cpu and memory pointers
  * We assume that the pc is pointing at the current opcode
  * return final location of data (uint16_t address)
+ *
+ * todo: update cycle count for every memory access
  */
+
+ // todo: potential type mismatch with return values of these
+ // readmem returns uint8_t, sharedinstruct accepts uint8_t
 
 uint16_t indexedindirect(cpustate * cpu, Memory * mem)
 {
