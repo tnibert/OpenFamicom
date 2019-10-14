@@ -33,35 +33,49 @@ void decode_and_execute(uint8_t opcode)
         case 0b01:
             switch (bbb)                        // evaluate addressing mode
             {
-                case 0b000:
+                // todo: need to ensure that all addressing functions are returning the final data from memory
+                // todo: add addressing functions for immediate and absolute
+                case 0b00000000:
                     data = zeropagex(cpu, mem);
+                    // will these inner breaks break out of the entire nested switch?
                     break;
-                case 0b001:
+                case 0b00000100:
                     data = zeropage(cpu, mem);
                     break;
-                case 0b010:
+                case 0b00001000:
                     data = mem->readmem(cpu->pc + 1);
                     break;                                               // immediate, todo: is this correct?
-                case 0b011:
-                    data = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));
-                    break;       // absolute, todo: is this correct?
-                case 0b100:
+                case 0b00001100:
+                    data = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));   // absolute, todo: is this correct?
+                    break;
+                case 0b00010000:
                     data = zeropagey(cpu, mem);
                     break;
-                case 0b101:
+                case 0b00010100:
                     data = zeropagex(cpu, mem);
                     break;
-                case 0b110:
+                case 0b00011000:
                     data = absolutey(cpu, mem);
                     break;
-                case 0b111:
+                case 0b00011100:
                     data = absolutex(cpu, mem);
                     break;
             }
-            switch (ccc)
+            switch (aaa)
             {
-                case 0b000:
+                case 0b00000000:
                     ORA(cpu, data);
+                    break;
+                case 0b00100000:
+                    AND(cpu, data);
+                    break;
+                case 0b01000000:
+                    EOR(cpu, data);
+                    break;
+                case 0b01100000:
+                    adc(cpu, data);
+                    break;
+                // next: STA, LDA, CMP, SBC
             }
             break;
         case 0b10:
@@ -69,4 +83,9 @@ void decode_and_execute(uint8_t opcode)
         case 0b11:
             break;
     }
+
+    // increment the program counter
+    // todo: remove all other program counter increments in code
+    // todo: do not increment counter in case of jump
+    cpu->pc++;
 }

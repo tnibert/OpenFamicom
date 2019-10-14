@@ -11,6 +11,8 @@
 #include <mutex>
 #include <assert.h>
 
+#define WORDBITWIDTH 8
+
 #define PPUREGSTART 0x2000
 #define APUIOREGSTART 0x4000
 #define CPUTESTMODESTART 0x4018
