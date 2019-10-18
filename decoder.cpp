@@ -33,7 +33,7 @@ void decode_and_execute(uint8_t opcode)
         case 0b01:
             switch (bbb)                        // evaluate addressing mode
             {
-                // todo: need to ensure that all addressing functions are returning the final data from memory
+                // todo: need to ensure that all addressing functions are returning the final data from memory, clear format
                 // todo: add addressing functions for immediate and absolute
                 case 0b00000000:
                     data = zeropagex(cpu, mem);
@@ -61,8 +61,7 @@ void decode_and_execute(uint8_t opcode)
                     data = absolutex(cpu, mem);
                     break;
             }
-            switch (aaa)
-            {
+            switch (aaa) {
                 case 0b00000000:
                     ORA(cpu, data);
                     break;
@@ -75,9 +74,23 @@ void decode_and_execute(uint8_t opcode)
                 case 0b01100000:
                     adc(cpu, data);
                     break;
-                // next: STA, LDA, CMP, SBC
+                case 0b10000000:
+                    sta(cpu, mem, data);
+                    break;
+                case 0b10100000:
+                    ld(&cpu->a, cpu, data);
+                    break;
+                case 0b11000000:
+                    // todo: CMP
+                    break;
+                case 0b11100000:
+                    // SBC
+                    sbc(cpu, data);
+                    break;
             }
+
             break;
+
         case 0b10:
             break;
         case 0b11:
