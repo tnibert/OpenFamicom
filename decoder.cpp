@@ -54,7 +54,8 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
             {
                 switch (bbb)                        // evaluate addressing mode
                 {
-
+                    case 0b00000000:
+                        data = immediate(cpu, mem);
                 }
             }
             switch (aaa)
@@ -120,7 +121,10 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
             {
                 switch (bbb)                        // evaluate addressing mode
                 {
-
+                    case 0b00000000:
+                        data = immediate(cpu, mem);
+                    case 0b00001000:
+                        data = cpu->a;
                 }
             }
             switch (aaa)
