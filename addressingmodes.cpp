@@ -16,9 +16,15 @@
  */
 
  // immediate addressing is passing the value specified in code
+uint8_t immediate(cpustate * cpu, Memory * mem)
+ {
+     cpu->pc++;
+     return mem->readmem(cpu->pc);
+ }
 
 uint8_t indexedindirect(cpustate * cpu, Memory * mem)
 {
+    // todo: what to increment pc by?
     // (Indirect,X) aka (zero page,X)
     uint8_t zpageaddr = mem->readmem(cpu->pc+1);
     uint16_t addr = zpageaddr + cpu->x;
@@ -35,22 +41,26 @@ uint8_t zeropage(cpustate * cpu, Memory * mem)
 
 uint8_t absolute(cpustate * cpu, Memory * mem)
 {
+    cpu->pc+=2;
     // is revlendianbytes() necessary?
     return mem->readmem(revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
 }
 
 uint8_t zeropagex(cpustate * cpu, Memory * mem)
 {
+    cpu->pc++;
     return mem->readmem(cpu->pc+1)+cpu->x;
 }
 
 uint8_t zeropagey(cpustate * cpu, Memory * mem)
 {
+    cpu->pc++;
     return mem->readmem(cpu->pc+1)+cpu->y;
 }
 
 uint8_t indirectindexed(cpustate * cpu, Memory * mem)
 {
+    // todo: what to increment pc by?
     // (Indirect),Y aka (zero page),Y
     uint8_t zpageaddr = mem->readmem(cpu->pc+1);
     uint16_t addr = (revlendianbytes(mem->readmem(zpageaddr), mem->readmem(zpageaddr+1))) + cpu->y;
@@ -59,6 +69,7 @@ uint8_t indirectindexed(cpustate * cpu, Memory * mem)
 
 uint8_t absolutey(cpustate * cpu, Memory * mem)
 {
+    cpu->pc+=2;
     uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2));
     addr += cpu->y;
     return addr;
@@ -66,6 +77,7 @@ uint8_t absolutey(cpustate * cpu, Memory * mem)
 
 uint8_t absolutex(cpustate * cpu, Memory * mem)
 {
+    cpu->pc+=2;
     uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2));
     addr += cpu->x;
     return addr;

@@ -24,7 +24,7 @@ InstructionDecoder::InstructionDecoder(cpustate * c, Memory * m)
  */
 int InstructionDecoder::decode_and_execute(uint8_t opcode)
 {
-    printf("In decode and execute\n");
+    printf("In decode and execute: op: %x, pc: %x\n", opcode, cpu->pc);
     uint8_t cc = opcode & 0b00000011;           // control code
     uint8_t bbb = opcode & 0b00011100;          // addressing mode
     uint8_t aaa = opcode & 0b11100000;          // operation
@@ -70,6 +70,7 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
                     // todo: add addressing functions for immediate and absolute
                     case 0b00000000:
                         // (zero page,X) aka (indirect,X)
+                        data = indexedindirect(cpu, mem);
                         // will these inner breaks break out of the entire nested switch?
                         break;
                     case 0b00001000: // immediate
@@ -130,13 +131,6 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
 
         // case 0b11 only used for illegal opcodes
     }
-
-    // increment the program counter
-    // todo: remove all other program counter increments in code
-    // todo: do not increment counter in case of jump
-    // todo: confirm amount to increment by - http://6502.org/tutorials/6502opcodes.html#PC
-    //
-    //cpu->pc += 2;
 
     return 1;       // replace this with cycles used
 }
