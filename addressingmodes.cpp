@@ -10,6 +10,8 @@
  * We assume that the pc is pointing at the current opcode
  * return final data (uint8_t)
  *
+ * This is the process of being refactored to match the above
+ *
  * todo: update cycle count for every memory access
  */
 
@@ -37,7 +39,6 @@ uint8_t absolute(cpustate * cpu, Memory * mem)
     return mem->readmem(revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
 }
 
-// this is a bit repetitive, think about a better design
 uint8_t zeropagex(cpustate * cpu, Memory * mem)
 {
     return mem->readmem(cpu->pc+1)+cpu->x;

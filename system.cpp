@@ -19,7 +19,8 @@ Famicom::Famicom(unsigned char * rom) {
 
     memory->loadprgrom(cart);
     //printf("prgrom start in memory: %x, cartridge prgrom start: %x\n", memory[0x4020], cart->prgrom);
-    opmap = create_opcode_map(cpu, memory);
+    //opmap = create_opcode_map(cpu, memory);
+    decoder = new InstructionDecoder(cpu, memory);
 }
 
 uint16_t revlendianbytes(uint8_t lsig, uint8_t msig)

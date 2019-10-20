@@ -4,15 +4,17 @@
 // put memory pointer in Famicom class
 int Famicom::emulate6502op()
 {
+    // increment program counter for instruction read
+    cpu->pc++;
     uint8_t opcode = memory->readmem(cpu->pc);
 
-    int cycles = opmap[opcode]->f();
+    int cycles = decoder->decode_and_execute(opcode);
 
     // synchronize ppu
-    for(int i = 0; i < cycles; i++)
-    {
+    //for(int i = 0; i < cycles; i++)
+    //{
         // execute ppu cycles
-    }
+    //}
 
     return 0;
 }

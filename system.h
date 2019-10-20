@@ -11,6 +11,8 @@
 #include <mutex>
 #include <assert.h>
 
+#include "decoder.h"
+
 #define WORDBITWIDTH 8
 
 #define PPUREGSTART 0x2000
@@ -25,6 +27,9 @@
 
 // todo: split this file into multiple headers
 // todo: this needs a general organization refactor, not intuitive where things are
+
+// forward declaration
+class InstructionDecoder;
 
 // class for instructions
 class opcode
@@ -103,10 +108,11 @@ class Famicom {
     Memory * memory;
     public:
         Famicom(unsigned char *);
-        std::map<uint8_t, std::shared_ptr<opcode> > opmap;      // can be private
+        //std::map<uint8_t, std::shared_ptr<opcode> > opmap;      // can be private
         int emulate6502op();
         uint16_t getpc();
         Cartridge * cart;
+        InstructionDecoder * decoder;
 };
 
 uint16_t revlendianbytes(uint8_t, uint8_t);
@@ -146,6 +152,8 @@ void decmem(cpustate *, Memory *, uint16_t);
 uint8_t indexedindirect(cpustate *, Memory *);
 
 uint8_t zeropage(cpustate *, Memory *);
+
+uint8_t absolute(cpustate *, Memory *);
 
 uint8_t zeropagex(cpustate *, Memory *);
 

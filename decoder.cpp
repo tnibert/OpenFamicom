@@ -4,24 +4,27 @@
 
 #include "decoder.h"
 #include "system.h"
+#include <stdio.h>
 
 /**
  * constructor
  */
-InstructionDecoder::InstructionDecoder(cpustate * c, Memory * mem)
+InstructionDecoder::InstructionDecoder(cpustate * c, Memory * m)
 {
     // register cpu state
     cpu = c;
+    mem = m;
 }
 
 /**
  * Decode an opcode and execute it
  * form aaabbbcc
  * bbb and ccc match ups depends on cc
- * todo: there is an issue with bit width mismatch
+ * return number of cycles used
  */
-void InstructionDecoder::decode_and_execute(uint8_t opcode)
+int InstructionDecoder::decode_and_execute(uint8_t opcode)
 {
+    printf("In decode and execute\n");
     uint8_t cc = opcode & 0b00000011;           // control code
     uint8_t bbb = opcode & 0b00011100;          // addressing mode
     uint8_t aaa = opcode & 0b11100000;          // operation
@@ -134,4 +137,6 @@ void InstructionDecoder::decode_and_execute(uint8_t opcode)
     // todo: confirm amount to increment by - http://6502.org/tutorials/6502opcodes.html#PC
     //
     //cpu->pc += 2;
+
+    return 1;       // replace this with cycles used
 }
