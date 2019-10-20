@@ -20,46 +20,65 @@ InstructionDecoder::InstructionDecoder(cpustate * c, Memory * mem)
  * bbb and ccc match ups depends on cc
  * todo: there is an issue with bit width mismatch
  */
-void decode_and_execute(uint8_t opcode)
+void InstructionDecoder::decode_and_execute(uint8_t opcode)
 {
     uint8_t cc = opcode & 0b00000011;           // control code
     uint8_t bbb = opcode & 0b00011100;          // addressing mode
     uint8_t aaa = opcode & 0b11100000;          // operation
     uint8_t data = NULL;
+
+    // the following addressing mode codes are universal regardless of cc
+    switch(bbb)
+    {
+        case 0b00000100: //always zero page
+            data = zeropage(cpu, mem);
+            break;
+        case 0b00001100: //always absolute
+            data = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));   // absolute, todo: is this correct?
+            break;
+        case 0b00010100: //always zero page,X
+            data = zeropagex(cpu, mem);
+            break;
+        case 0b00011100: //always absolute,X
+            data = absolutex(cpu, mem);
+            break;
+    }
+
     switch(cc)                                  // evaluate control code
     {
-        case 0b01:
+        case 0b00:
+            if(data == NULL)
+            {
+                switch (bbb)                        // evaluate addressing mode
+                {
+
+                }
+            }
+            switch (aaa)
+            {
+
+            }
             break;
         case 0b01:
-            switch (bbb)                        // evaluate addressing mode
-            {
-                // todo: need to ensure that all addressing functions are returning the final data from memory, clear format
-                // todo: add addressing functions for immediate and absolute
-                case 0b00000000:
-                    data = zeropagex(cpu, mem);
-                    // will these inner breaks break out of the entire nested switch?
-                    break;
-                case 0b00000100:
-                    data = zeropage(cpu, mem);
-                    break;
-                case 0b00001000:
-                    data = mem->readmem(cpu->pc + 1);
-                    break;                                               // immediate, todo: is this correct?
-                case 0b00001100:
-                    data = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));   // absolute, todo: is this correct?
-                    break;
-                case 0b00010000:
-                    data = zeropagey(cpu, mem);
-                    break;
-                case 0b00010100:
-                    data = zeropagex(cpu, mem);
-                    break;
-                case 0b00011000:
-                    data = absolutey(cpu, mem);
-                    break;
-                case 0b00011100:
-                    data = absolutex(cpu, mem);
-                    break;
+            if(data==NULL) {
+                switch (bbb)                        // evaluate addressing mode
+                {
+                    // todo: need to ensure that all addressing functions are returning the final data from memory, clear format
+                    // todo: add addressing functions for immediate and absolute
+                    case 0b00000000:
+                        // (zero page,X)
+                        // will these inner breaks break out of the entire nested switch?
+                        break;
+                    case 0b00001000:
+                        data = mem->readmem(cpu->pc + 1);
+                        break;                                               // immediate, todo: is this correct?
+                    case 0b00010000:
+                        data = zeropagey(cpu, mem);
+                        break;
+                    case 0b00011000:
+                        data = absolutey(cpu, mem);
+                        break;
+                }
             }
             switch (aaa) {
                 case 0b00000000:
@@ -92,9 +111,21 @@ void decode_and_execute(uint8_t opcode)
             break;
 
         case 0b10:
+            // todo: update these functions for the 0b10 control codes
+            if(data == NULL)
+            {
+                switch (bbb)                        // evaluate addressing mode
+                {
+
+                }
+            }
+            switch (aaa)
+            {
+
+            }
             break;
-        case 0b11:
-            break;
+
+        // case 0b11 only used for illegal opcodes
     }
 
     // increment the program counter
