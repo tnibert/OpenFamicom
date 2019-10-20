@@ -37,7 +37,7 @@ cpustate * initcpu()
 {
     // initialize cpu state
     cpustate * cpu = (cpustate *)calloc(1, sizeof(cpustate));
-    cpu->pc = PRGROMSTART;                         // may not start at 0
+    cpu->pc = PRGROMSTART;
     // todo: verify all initial values
     cpu->a = 0;
     cpu->x = 0;

@@ -1,5 +1,9 @@
 #include "system.h"
 
+/**
+ * DEPRECATED
+ */
+
 /*
  * https://ascii.cl/conversion.htm
  * Well... I think this is fundamentally flawed now...
@@ -16,9 +20,6 @@
 
 // todo: !!! I have made a very erroneous assumption about the carry flag - it is bit 0, not bit 7
 // todo: go back and change every access to carry flag... fuck
-
-// todo: oh no, program counter must always be incremented by a constant (word size) except in jump
-// Need to account for PCL vs PCH and PCLC
 
 // Nooooooooo http://nparker.llx.com/a2/opcodes.html
 // todo: need a new opcode model, create decoder class

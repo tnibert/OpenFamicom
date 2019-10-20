@@ -34,7 +34,7 @@ void InstructionDecoder::decode_and_execute(uint8_t opcode)
             data = zeropage(cpu, mem);
             break;
         case 0b00001100: //always absolute
-            data = revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2));   // absolute, todo: is this correct?
+            data = absolute(cpu, mem);
             break;
         case 0b00010100: //always zero page,X
             data = zeropagex(cpu, mem);
@@ -66,12 +66,12 @@ void InstructionDecoder::decode_and_execute(uint8_t opcode)
                     // todo: need to ensure that all addressing functions are returning the final data from memory, clear format
                     // todo: add addressing functions for immediate and absolute
                     case 0b00000000:
-                        // (zero page,X)
+                        // (zero page,X) aka (indirect,X)
                         // will these inner breaks break out of the entire nested switch?
                         break;
-                    case 0b00001000:
+                    case 0b00001000: // immediate
                         data = mem->readmem(cpu->pc + 1);
-                        break;                                               // immediate, todo: is this correct?
+                        break;
                     case 0b00010000:
                         data = zeropagey(cpu, mem);
                         break;
@@ -131,5 +131,7 @@ void InstructionDecoder::decode_and_execute(uint8_t opcode)
     // increment the program counter
     // todo: remove all other program counter increments in code
     // todo: do not increment counter in case of jump
-    cpu->pc++;
+    // todo: confirm amount to increment by - http://6502.org/tutorials/6502opcodes.html#PC
+    //
+    //cpu->pc += 2;
 }

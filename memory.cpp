@@ -112,6 +112,12 @@ void Memory::writemem(uint16_t addr, uint8_t data)
     //throw MemoryAccessException;
 
 }
+
+/**
+ * Read data from memory
+ * @param addr the final address to read memory from uint16_t
+ * @return the data read from memory
+ */
 uint8_t Memory::readmem(uint16_t addr)
 {
     if(addr < 0x800)

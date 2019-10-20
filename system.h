@@ -143,19 +143,19 @@ void decreg(cpustate *, uint8_t *);
 void decmem(cpustate *, Memory *, uint16_t);
 
 // addressing modes
-uint16_t indexedindirect(cpustate *, Memory *);
+uint8_t indexedindirect(cpustate *, Memory *);
 
-uint16_t zeropage(cpustate *, Memory *);
+uint8_t zeropage(cpustate *, Memory *);
 
-uint16_t zeropagex(cpustate *, Memory *);
+uint8_t zeropagex(cpustate *, Memory *);
 
-uint16_t zeropagey(cpustate *, Memory *);
+uint8_t zeropagey(cpustate *, Memory *);
 
-uint16_t indirectindexed(cpustate *, Memory *);
+uint8_t indirectindexed(cpustate *, Memory *);
 
-uint16_t absolutey(cpustate *, Memory *);
+uint8_t absolutey(cpustate *, Memory *);
 
-uint16_t absolutex(cpustate *, Memory *);
+uint8_t absolutex(cpustate *, Memory *);
 
 // flag setting (flags.cpp)
 bool setzeroflag(uint8_t, cpustate *);
