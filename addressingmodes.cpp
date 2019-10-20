@@ -11,7 +11,7 @@
  * return final data (uint8_t)
  *
  * todo: double check these, unit test
- *
+ * todo: confirm correct usage of revlendianbytes() and necessity
  * todo: update cycle count for every memory access
  */
 
@@ -25,7 +25,7 @@ uint8_t immediate(cpustate * cpu, Memory * mem)
 uint8_t zeropage(cpustate * cpu, Memory * mem)
 {
     cpu->pc++;
-    uint8_t finaladdr = mem->readmem(cpu->pc+1);
+    uint8_t finaladdr = mem->readmem(cpu->pc);
     return mem->readmem(finaladdr);
 }
 
@@ -33,26 +33,26 @@ uint8_t absolute(cpustate * cpu, Memory * mem)
 {
     cpu->pc+=2;
     // is revlendianbytes() necessary?
-    return mem->readmem(revlendianbytes(mem->readmem(cpu->pc + 1), mem->readmem(cpu->pc + 2)));
+    return mem->readmem(revlendianbytes(mem->readmem(cpu->pc-1), mem->readmem(cpu->pc)));
 }
 
 uint8_t zeropagex(cpustate * cpu, Memory * mem)
 {
     cpu->pc++;
-    return mem->readmem(mem->readmem(cpu->pc+1)+cpu->x);
+    return mem->readmem(mem->readmem(cpu->pc)+cpu->x);
 }
 
 uint8_t zeropagey(cpustate * cpu, Memory * mem)
 {
     cpu->pc++;
-    return mem->readmem(mem->readmem(cpu->pc+1)+cpu->y);
+    return mem->readmem(mem->readmem(cpu->pc)+cpu->y);
 }
 
 uint8_t indexedindirect(cpustate * cpu, Memory * mem)
 {
     // (Indirect,X) aka (zero page,X)
     cpu->pc++;
-    uint8_t zpageaddr = mem->readmem(cpu->pc+1);
+    uint8_t zpageaddr = mem->readmem(cpu->pc);
     uint16_t addr = zpageaddr + cpu->x;
     // we have to read from addr to find the new addr to load from?
     uint16_t finaladdr = revlendianbytes(mem->readmem(addr), mem->readmem(addr+1));
@@ -63,7 +63,7 @@ uint8_t indirectindexed(cpustate * cpu, Memory * mem)
 {
     // (Indirect),Y aka (zero page),Y
     cpu->pc++;
-    uint8_t zpageaddr = mem->readmem(cpu->pc+1);
+    uint8_t zpageaddr = mem->readmem(cpu->pc);
     uint16_t addr = (revlendianbytes(mem->readmem(zpageaddr), mem->readmem(zpageaddr+1))) + cpu->y;
     return mem->readmem(addr);
 }
@@ -71,7 +71,7 @@ uint8_t indirectindexed(cpustate * cpu, Memory * mem)
 uint8_t absolutey(cpustate * cpu, Memory * mem)
 {
     cpu->pc+=2;
-    uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2));
+    uint16_t addr = revlendianbytes(mem->readmem(cpu->pc-1), mem->readmem(cpu->pc));
     addr += cpu->y;
     return mem->readmem(addr);
 }
@@ -79,7 +79,7 @@ uint8_t absolutey(cpustate * cpu, Memory * mem)
 uint8_t absolutex(cpustate * cpu, Memory * mem)
 {
     cpu->pc+=2;
-    uint16_t addr = revlendianbytes(mem->readmem(cpu->pc+1), mem->readmem(cpu->pc+2));
+    uint16_t addr = revlendianbytes(mem->readmem(cpu->pc-1), mem->readmem(cpu->pc));
     addr += cpu->x;
     return mem->readmem(addr);
 }

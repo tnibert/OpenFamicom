@@ -149,6 +149,8 @@ void decreg(cpustate *, uint8_t *);
 void decmem(cpustate *, Memory *, uint16_t);
 
 // addressing modes
+uint8_t immediate(cpustate *, Memory *);
+
 uint8_t indexedindirect(cpustate *, Memory *);
 
 uint8_t zeropage(cpustate *, Memory *);

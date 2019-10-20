@@ -74,7 +74,7 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
                         // will these inner breaks break out of the entire nested switch?
                         break;
                     case 0b00001000: // immediate
-                        data = mem->readmem(cpu->pc + 1);
+                        data = immediate(cpu, mem);
                         break;
                     case 0b00010000:
                         data = zeropagey(cpu, mem);
