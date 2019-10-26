@@ -60,7 +60,27 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
             }
             switch (aaa)
             {
-
+                case 0b00100000:
+                    //BIT
+                    break;
+                case 0b01000000:
+                    //JMP
+                    break;
+                case 0b01100000:
+                    //JMP (abs)
+                    break;
+                case 0b10000000:
+                    //STY
+                    break;
+                case 0b10100000:
+                    //LDY
+                    break;
+                case 0b11000000:
+                    //CPY
+                    break;
+                case 0b11100000:
+                    //CPX
+                    break;
             }
             break;
         case 0b01:
@@ -116,7 +136,6 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
             break;
 
         case 0b10:
-            // todo: update these functions for the 0b10 control codes
             if(data == NULL)
             {
                 switch (bbb)                        // evaluate addressing mode
@@ -129,12 +148,35 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
             }
             switch (aaa)
             {
-
+                case 0b00000000:
+                    //asl
+                    break;
+                case 0b00100000:
+                    //rol
+                    break;
+                case 0b01000000:
+                    //lsr
+                    break;
+                case 0b01100000:
+                    //ror
+                    break;
+                case 0b10000000:
+                    //stx
+                    break;
+                case 0b10100000:
+                    //ldx
+                    break;
+                case 0b11000000:
+                    //dec
+                    break;
+                case 0b11100000:
+                    //inc
+                    break;
             }
             break;
 
         // case 0b11 only used for illegal opcodes
     }
 
-    return 1;       // replace this with cycles used
+    return 1;       // replace this with cycles used?
 }
