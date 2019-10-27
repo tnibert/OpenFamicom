@@ -36,3 +36,8 @@ void TestBasicCPUOperations::test_ORA()
     CPPUNIT_ASSERT(cpu->a == 0b00000000);
     CPPUNIT_ASSERT(cpu->p == 0b00110110);
 }
+
+void TestBasicCPUOperations::test_LD()
+{
+
+}

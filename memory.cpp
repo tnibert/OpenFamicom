@@ -106,7 +106,9 @@ void Memory::writemem(uint16_t addr, uint8_t data)
     {
         // PRG area and mapper registers
         // come to think, we should never be writing to ROM...
-        prg[addr-PRGROMSTART] = data;
+        //prg[addr-PRGROMSTART] = data;
+        throw MemoryAccessException;
+
     }
 
     //throw MemoryAccessException;

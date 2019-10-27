@@ -15,5 +15,5 @@ void TestAddressingModes::setUp(void)
 
 void TestAddressingModes::test_zeropage()
 {
-
+    //mem->writemem()
 }

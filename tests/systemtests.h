@@ -17,6 +17,7 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/XmlOutputter.h>
 
+/*
 class TestOpCodes : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE( TestOpCodes );
@@ -35,7 +36,7 @@ class TestOpCodes : public CppUnit::TestFixture
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestOpCodes );
-
+*/
 
 /**
  * These will test sharedinstruct.cpp
@@ -81,7 +82,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION( TestBasicCPUOperations );
 class TestAddressingModes : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE( TestAddressingModes );
-    CPPUNIT_TEST( test_immediate ); // add unit test
+    CPPUNIT_TEST( test_zeropage );
     CPPUNIT_TEST_SUITE_END();
 
     private:
@@ -101,6 +102,24 @@ class TestAddressingModes : public CppUnit::TestFixture
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestAddressingModes );
+
+/**
+ * Test memory class
+ */
+class TestMemory : public CppUnit::TestFixture
+{
+    CPPUNIT_TEST_SUITE( TestMemory );
+    CPPUNIT_TEST( test_readwrite ); // add unit test
+    CPPUNIT_TEST_SUITE_END();
+
+private:
+        Memory * mem;
+    public:
+        void setUp(void);
+        void test_readwrite();
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( TestMemory );
 
 #endif //OPENNES_SYSTEMTESTS_H
 
