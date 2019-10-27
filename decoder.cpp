@@ -28,34 +28,35 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
     uint8_t cc = opcode & 0b00000011;           // control code
     uint8_t bbb = opcode & 0b00011100;          // addressing mode
     uint8_t aaa = opcode & 0b11100000;          // operation
+    uint16_t addr = NULL;
     uint8_t data = NULL;
 
     // the following addressing mode codes are universal regardless of cc
     switch(bbb)
     {
         case 0b00000100: //always zero page
-            data = zeropage(cpu, mem);
+            addr = zeropage(cpu, mem);
             break;
         case 0b00001100: //always absolute
-            data = absolute(cpu, mem);
+            addr = absolute(cpu, mem);
             break;
         case 0b00010100: //always zero page,X
-            data = zeropagex(cpu, mem);
+            addr = zeropagex(cpu, mem);
             break;
         case 0b00011100: //always absolute,X
-            data = absolutex(cpu, mem);
+            addr = absolutex(cpu, mem);
             break;
     }
 
     switch(cc)                                  // evaluate control code
     {
         case 0b00:
-            if(data == NULL)
+            if(addr == NULL)
             {
                 switch (bbb)                        // evaluate addressing mode
                 {
                     case 0b00000000:
-                        data = immediate(cpu, mem);
+                        addr = immediate(cpu);
                 }
             }
             switch (aaa)
@@ -67,7 +68,7 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
                     //JMP
                     break;
                 case 0b01100000:
-                    //JMP (abs)
+                    //JMP (abs) - Indirect
                     break;
                 case 0b10000000:
                     //STY
@@ -84,24 +85,22 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
             }
             break;
         case 0b01:
-            if(data==NULL) {
+            if(addr==NULL) {
                 switch (bbb)                        // evaluate addressing mode
                 {
-                    // todo: need to ensure that all addressing functions are returning the final data from memory, clear format
-                    // todo: add addressing functions for immediate and absolute
                     case 0b00000000:
                         // (zero page,X) aka (indirect,X)
-                        data = indexedindirect(cpu, mem);
+                        addr = indexedindirect(cpu, mem);
                         // will these inner breaks break out of the entire nested switch?
                         break;
                     case 0b00001000: // immediate
-                        data = immediate(cpu, mem);
+                        addr = immediate(cpu);
                         break;
                     case 0b00010000:
-                        data = zeropagey(cpu, mem);
+                        addr = zeropagey(cpu, mem);
                         break;
                     case 0b00011000:
-                        data = absolutey(cpu, mem);
+                        addr = absolutey(cpu, mem);
                         break;
                 }
             }
@@ -136,14 +135,14 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
             break;
 
         case 0b10:
-            if(data == NULL)
+            if(addr == NULL)
             {
                 switch (bbb)                        // evaluate addressing mode
                 {
                     case 0b00000000:
-                        data = immediate(cpu, mem);
+                        addr = immediate(cpu);
                     case 0b00001000:
-                        data = cpu->a;
+                        addr = cpu->a;
                 }
             }
             switch (aaa)

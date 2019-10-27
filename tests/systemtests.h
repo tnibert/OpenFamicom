@@ -36,6 +36,10 @@ class TestOpCodes : public CppUnit::TestFixture
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestOpCodes );
 
+
+/**
+ * These will test sharedinstruct.cpp
+ */
 class TestBasicCPUOperations : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE( TestBasicCPUOperations );
@@ -49,9 +53,54 @@ class TestBasicCPUOperations : public CppUnit::TestFixture
         //static CppUnit::Test *suite();
 
         void test_ORA();
+        void test_LD();
+        void test_STA();
+        void test_STY();
+        void test_STX();
+        void test_ADC();
+        void test_SBC();
+        void test_AND();
+        void test_EOR();
+        void test_ASL();
+        void test_LSR();
+        void test_ROR();
+        void test_ROL();
+        void test_INC();
+        void test_DEC();
+        void test_compare();
+        void test_BIT();
+        void test_PUSH();
+        void test_POP();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestBasicCPUOperations );
+
+/**
+ * Test addressing modes
+ */
+class TestAddressingModes : public CppUnit::TestFixture
+{
+    CPPUNIT_TEST_SUITE( TestAddressingModes );
+    CPPUNIT_TEST( test_immediate ); // add unit test
+    CPPUNIT_TEST_SUITE_END();
+
+    private:
+        cpustate * cpu;
+        Memory * mem;
+    public:
+        void setUp();
+        void test_immediate();
+        void test_zeropage();
+        void test_absolute();
+        void test_zeropagex();
+        void test_zeropagey();
+        void test_indexedindirect();
+        void test_indirectindexed();
+        void test_absolutey();
+        void test_absolutex();
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( TestAddressingModes );
 
 #endif //OPENNES_SYSTEMTESTS_H
 
