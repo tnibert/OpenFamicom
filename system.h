@@ -10,6 +10,7 @@
 #include <chrono>
 #include <mutex>
 #include <assert.h>
+#include <exception>
 
 #include "decoder.h"
 
@@ -96,6 +97,14 @@ class Memory
         // the following are for reading and writing memory, uint16_t is the address
         void writemem(uint16_t, uint8_t);
         uint8_t readmem(uint16_t);
+};
+
+struct MemoryAccessException : public std::exception
+{
+    const char * what () const throw ()
+    {
+        return "Invalid Memory Access";
+    }
 };
 
 class Vram

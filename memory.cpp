@@ -1,4 +1,6 @@
 #include "system.h"
+#include <exception>
+#include <iostream>
 
 /*
  * This map will need some reworking
@@ -48,17 +50,11 @@ Memory::Memory()
     prg = new uint8_t[0xBFE0];
 }
 
-void MemoryAccessException(){
-
-}
-
 uint16_t convertmirror(uint16_t addr, int factor)
 {
     // maybe this deserves its own function to convert mirror addresses, not sure yet
     return 0;
 }
-
-// todo: create unit tests
 
 void Memory::writemem(uint16_t addr, uint8_t data)
 {
@@ -107,7 +103,7 @@ void Memory::writemem(uint16_t addr, uint8_t data)
         // PRG area and mapper registers
         // come to think, we should never be writing to ROM...
         //prg[addr-PRGROMSTART] = data;
-        throw MemoryAccessException;
+        throw MemoryAccessException();
 
     }
 
@@ -161,7 +157,7 @@ uint8_t Memory::readmem(uint16_t addr)
     }
 
     // if we get here, return error code or raise
-    throw MemoryAccessException;
+    throw MemoryAccessException();
 }
 
 void Memory::loadprgrom(Cartridge * cart)
