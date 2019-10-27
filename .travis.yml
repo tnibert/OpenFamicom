@@ -1,0 +1,9 @@
+language: cpp
+compiler:
+  - gcc
+install:
+  - sudo apt-get update
+  - sudo apt-get install libcppunit-dev libcppunit-1.12-1
+  - make test
+script:
+  - ./TestOpenFamicom
