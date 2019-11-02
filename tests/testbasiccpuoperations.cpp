@@ -1,4 +1,5 @@
 #include "systemtests.h"
+//#include <bitset>
 
 using namespace CppUnit;
 
@@ -26,7 +27,8 @@ void TestBasicCPUOperations::test_ORA()
     ORA(cpu, arg);
 
     CPPUNIT_ASSERT(cpu->a == 0b10010001);
-    CPPUNIT_ASSERT(cpu->p == 0b10110100);       // failing here
+    //std::cout << std::bitset<8>(cpu->p)  << std::endl; - display as binary
+    CPPUNIT_ASSERT(cpu->p == 0b10110100);
 
     // test zero flag
     arg = 0b00000000;

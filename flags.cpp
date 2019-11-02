@@ -14,6 +14,8 @@
         I = interrupt
         Z = zero
         C = carry
+
+  * https://wiki.nesdev.com/w/index.php/Status_flags
  */
 
 bool setzeroflag(uint8_t compval, cpustate * cpu)
@@ -21,12 +23,12 @@ bool setzeroflag(uint8_t compval, cpustate * cpu)
     // if compval is 0, zero flag is set
     if(compval == 0)
     {
-        cpu->p |= (1 << 6);
+        cpu->p |= (1 << 1);
         return true;
     }
     else
     {
-        cpu->p &= ~(1 << 6);
+        cpu->p &= ~(1 << 1);
         return false;
     }
 }
@@ -36,12 +38,12 @@ bool setnegflag(uint8_t compval, cpustate * cpu)
     // if bit 7 of compval is on, negative flag is set
     if(compval & 0x80)
     {
-        cpu->p |= 1;
+        cpu->p |= (1 << 7);
         return true;
     }
     else
     {
-        cpu->p &= ~1;
+        cpu->p &= ~(1 << 7);
         return false;
     }
 }
