@@ -2,6 +2,8 @@
 #include <exception>
 #include <iostream>
 
+#define INTERNAL_MEM_MIRROR_INTERVAL 0x800
+
 /*
  * This map will need some reworking
  * loading of prgrom, etc
@@ -69,13 +71,8 @@ void Memory::writemem(uint16_t addr, uint8_t data)
     }
     else if(0x800 <= addr && addr < PPUREGSTART)
     {
-        // not as beautiful, we are dealing with a mirror address
-        // we mirror every 600 bytes
-        // set should give us which iteration of 600 above 0x800 we are
-        // then addr-(set*600) should convert us to the address under 0x800
-        // this works because int division loses the remainder
-        int set = addr/600;
-        internalram[addr-(set*600)] = data;
+        // Dealing with a mirror address
+        internalram[addr%INTERNAL_MEM_MIRROR_INTERVAL] = data;
     }
     else if(PPUREGSTART <= addr && addr < 0x2008)
     {
@@ -125,9 +122,8 @@ uint8_t Memory::readmem(uint16_t addr)
     }
     else if(0x800 <= addr && addr < PPUREGSTART)
     {
-        // not as beautiful, we are dealing with a mirror address
-        int set = addr/600;
-        return internalram[addr-(set*600)];
+        // mirrored address
+        return internalram[addr%INTERNAL_MEM_MIRROR_INTERVAL];
     }
     else if(PPUREGSTART <= addr && addr < 0x2008)
     {
