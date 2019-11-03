@@ -47,3 +47,8 @@ bool setnegflag(uint8_t compval, cpustate * cpu)
         return false;
     }
 }
+
+bool getflag(cpustate * cpu, int bit)
+{
+    return (cpu->p & (1 << bit)) == (1 << bit);
+}
