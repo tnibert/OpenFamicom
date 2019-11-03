@@ -36,6 +36,11 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
         uint8_t xx = opcode & 0b11000000;
         bool y = (opcode & 0b00100000) >> 5;
         // todo: finish this
+
+        /*switch(xx)
+        {
+
+        }*/
     }
     else
     // form aaabbbcc instruction
@@ -65,7 +70,8 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
         switch (cc)                                  // evaluate control code
         {
             case 0b00:
-                if (addr == NULL) {
+                if (addr == NULL)
+                {
                     switch (bbb)                        // evaluate addressing mode
                     {
                         case 0b00000000:
@@ -73,7 +79,8 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
                     }
                 }
                 data = mem->readmem(addr);
-                switch (aaa) {
+                switch (aaa)
+                {
                     case 0b00100000:
                         //BIT
                         break;
@@ -98,7 +105,8 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
                 }
                 break;
             case 0b01:
-                if (addr == NULL) {
+                if (addr == NULL)
+                {
                     switch (bbb)                        // evaluate addressing mode
                     {
                         case 0b00000000:
@@ -149,7 +157,8 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
                 break;
 
             case 0b10:
-                if (addr == NULL) {
+                if (addr == NULL)
+                {
                     switch (bbb)                        // evaluate addressing mode
                     {
                         case 0b00000000:
@@ -159,7 +168,8 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
                     }
                 }
                 data = mem->readmem(addr);
-                switch (aaa) {
+                switch (aaa)
+                {
                     case 0b00000000:
                         //asl
                         break;
