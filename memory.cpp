@@ -2,7 +2,7 @@
 #include <exception>
 #include <iostream>
 
-#define INTERNAL_MEM_MIRROR_INTERVAL 0x800
+#define INTERNAL_MEM_SIZE 0x800
 
 /*
  * This map will need some reworking
@@ -45,7 +45,7 @@
 
 Memory::Memory()
 {
-    internalram = new uint8_t[0x800];
+    internalram = new uint8_t[INTERNAL_MEM_SIZE];
     ppureg = new uint8_t[0x0008];
     apuioreg = new uint8_t[0x0018];
     cputestmode = new uint8_t[0x0008];
@@ -64,15 +64,15 @@ void Memory::writemem(uint16_t addr, uint8_t data)
     // everything is addr - offset
     // some of these && conditions can be done away with
 
-    if(addr < 0x800)
+    if(addr < INTERNAL_MEM_SIZE)
     {
         // beautiful, we can directly access by provided address
         internalram[addr] = data;
     }
-    else if(0x800 <= addr && addr < PPUREGSTART)
+    else if(INTERNAL_MEM_SIZE <= addr && addr < PPUREGSTART)
     {
         // Dealing with a mirror address
-        internalram[addr%INTERNAL_MEM_MIRROR_INTERVAL] = data;
+        internalram[addr%INTERNAL_MEM_SIZE] = data;
     }
     else if(PPUREGSTART <= addr && addr < 0x2008)
     {
@@ -115,15 +115,15 @@ void Memory::writemem(uint16_t addr, uint8_t data)
  */
 uint8_t Memory::readmem(uint16_t addr)
 {
-    if(addr < 0x800)
+    if(addr < INTERNAL_MEM_SIZE)
     {
         // beautiful, we can directly access by provided address
         return internalram[addr];
     }
-    else if(0x800 <= addr && addr < PPUREGSTART)
+    else if(INTERNAL_MEM_SIZE <= addr && addr < PPUREGSTART)
     {
         // mirrored address
-        return internalram[addr%INTERNAL_MEM_MIRROR_INTERVAL];
+        return internalram[addr%INTERNAL_MEM_SIZE];
     }
     else if(PPUREGSTART <= addr && addr < 0x2008)
     {
@@ -166,4 +166,17 @@ void Memory::loadprgrom(Cartridge * cart)
     {
         prg[i] = cart->prgrom[i];                                     // this copies the data from cart->prgrom to memory[0x4020], not the reference
     }*/
+}
+
+void Memory::print_internal_mem()
+{
+    for(int i = 0; i < INTERNAL_MEM_SIZE; i++)
+    {
+        if(i%64 == 0)
+        {
+            std::cout << std::endl;
+        }
+        printf("%2x", internalram[i]);
+    }
+    std::cout << std::endl;
 }

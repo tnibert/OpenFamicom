@@ -97,6 +97,7 @@ class Memory
         // the following are for reading and writing memory, uint16_t is the address
         void writemem(uint16_t, uint8_t);
         uint8_t readmem(uint16_t);
+        void print_internal_mem();
 };
 
 struct MemoryAccessException : public std::exception
