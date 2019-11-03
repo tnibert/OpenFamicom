@@ -17,26 +17,7 @@
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/XmlOutputter.h>
 
-/*
-class TestOpCodes : public CppUnit::TestFixture
-{
-    CPPUNIT_TEST_SUITE( TestOpCodes );
-    CPPUNIT_TEST( test_ORA_0x01_indirect_x );
-    CPPUNIT_TEST_SUITE_END();
-    private:
-        cpustate * cpu;
-        Memory * memory;
-        std::map<uint8_t, std::shared_ptr<opcode> > opmap;
-
-    public:
-        void setUp(void);
-        //static CppUnit::Test *suite();
-
-        void test_ORA_0x01_indirect_x();
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION( TestOpCodes );
-*/
+//Cartridge load_mock_cartridge();
 
 /**
  * These will test sharedinstruct.cpp
@@ -120,6 +101,28 @@ private:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestMemory );
+
+/**
+ * Test decoder
+ */
+class TestDecoder : public CppUnit::TestFixture
+{
+    CPPUNIT_TEST_SUITE( TestDecoder );
+    CPPUNIT_TEST( test_aaabbbcc );
+    CPPUNIT_TEST_SUITE_END();
+
+    private:
+        cpustate * cpu;
+        Memory * mem;
+        InstructionDecoder * decoder;
+    public:
+        void setUp();
+        void test_branching();
+        void test_aaabbbcc();
+        void test_singlebyte();
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( TestDecoder );
 
 #endif //OPENNES_SYSTEMTESTS_H
 
