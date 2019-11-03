@@ -109,6 +109,7 @@ class TestDecoder : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE( TestDecoder );
     CPPUNIT_TEST( test_aaabbbcc );
+    CPPUNIT_TEST( test_branching );
     CPPUNIT_TEST_SUITE_END();
 
     private:

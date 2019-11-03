@@ -20,7 +20,7 @@ InstructionDecoder::InstructionDecoder(cpustate * c, Memory * m)
 /**
  * Decode an opcode and execute it
  * form aaabbbcc or xxy10000
- * bbb and ccc match ups depends on cc
+ * bbb and aaa match ups depends on cc
  * return number of cycles used
  */
 int InstructionDecoder::decode_and_execute(uint8_t opcode)
@@ -30,20 +30,67 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
     // todo: single byte instructions
 
     // The conditional branch instructions all have the form xxy10000.
-    // The flag indicated by xx is compared with y, and the branch is taken if they are equal.
     if((opcode | 0b11100000) == 0b11110000)
     {
-        uint8_t xx = opcode & 0b11000000;
-        bool y = (opcode & 0b00100000) >> 5;
-        // todo: finish this
+        // todo: BRK, JSR abs, RTI, RTS
+        bool to_jump = decode_branch(opcode);
 
-        /*switch(xx)
+        if(to_jump)
         {
+            // these can use relative (all branch instructions) or absolute addressing
+            // need to differentiate
+            // the following won't cut it
+            // relative - signed 8 bit relative offset (e.g. -128 to +127)
 
-        }*/
+            // relative, todo: account for sign (is this two's comp?)
+            //cpu->pc += mem->readmem(cpu->pc + mem->readmem(cpu->pc+1));
+            // absolute:
+            //cpu->pc = mem->readmem(revlendianbytes(cpu->pc+2, cpu->pc+1));
+        }
     }
-    else
     // form aaabbbcc instruction
+    else
+    {
+        decode_aaabbbcc(opcode);
+    }
+
+    return 1;       // replace this with cycles used?
+}
+
+bool InstructionDecoder::decode_branch(uint8_t opcode)
+{
+    // The flag indicated by xx is compared with y, and the branch is taken if they are equal.
+    // this gives us: BPL, BMI, BVC, BVS, BCC, BCS, BNE, BEQ
+    uint8_t xx = (opcode & 0b11000000) >> 6;
+    int flag;
+    bool y = (opcode & 0b00100000) >> 5;
+    bool to_jump = false;
+
+    // determine the flag to evaluate
+    switch(xx)
+    {
+        case 0b00:                              // test negative flag
+            flag = FLAG_NEGATIVE;
+            break;
+        case 0b01:                              // test overflow flag
+            flag = FLAG_OVERFLOW;
+            break;
+        case 0b10:                              // test carry flag
+            flag = FLAG_CARRY;
+            break;
+        case 0b11:                              // test zero flag
+            flag = FLAG_ZERO;
+            break;
+    }
+
+    // compare the flag with y
+    to_jump = (getflag(cpu, flag) == y);
+
+    return to_jump;
+}
+
+void InstructionDecoder::decode_aaabbbcc(uint8_t opcode)
+{
     {
         uint8_t cc = opcode & 0b00000011;           // control code
         uint8_t bbb = opcode & 0b00011100;          // addressing mode
@@ -200,5 +247,4 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
                 // case 0b11 only used for illegal opcodes
         }
     }
-    return 1;       // replace this with cycles used?
 }

@@ -26,3 +26,19 @@ void TestDecoder::test_aaabbbcc()
     CPPUNIT_ASSERT(cpu->a == 0b11111111);
 }
 
+void TestDecoder::test_branching()
+{
+    cpu->pc = 0;
+    cpu->p = 0b00000010;
+    //mem->writemem(0, 0xf0);
+    mem->writemem(1, 3);                            // branch +3 bytes
+
+    bool test = decoder->decode_branch(0xf0);       // decode BEQ
+    CPPUNIT_ASSERT(test);
+
+    cpu->p = 0b0;
+    test = decoder->decode_branch(0xf0);
+    CPPUNIT_ASSERT(!test);
+
+    // todo: test the jumping
+}

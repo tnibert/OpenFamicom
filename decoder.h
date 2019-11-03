@@ -14,6 +14,8 @@ class InstructionDecoder
     public:
         InstructionDecoder(cpustate *, Memory *);
         int decode_and_execute(uint8_t);
+        void decode_aaabbbcc(uint8_t);
+        bool decode_branch(uint8_t);
 };
 
 
