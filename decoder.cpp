@@ -28,24 +28,18 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
     printf("In decode and execute: op: %x, pc: %x\n", opcode, cpu->pc);
 
     // todo: single byte instructions
+    // todo: BRK, JSR abs, RTI, RTS
 
-    // The conditional branch instructions all have the form xxy10000.
+    // The conditional branch instructions all have the form xxy10000
+    // they use relative addressing
+    // BPL, BMI, BVC, BVS, BCC, BCS, BNE, BEQ
     if((opcode | 0b11100000) == 0b11110000)
     {
-        // todo: BRK, JSR abs, RTI, RTS
         bool to_jump = decode_branch(opcode);
 
         if(to_jump)
         {
-            // these can use relative (all branch instructions) or absolute addressing
-            // need to differentiate
-            // the following won't cut it
-            // relative - signed 8 bit relative offset (e.g. -128 to +127)
-
-            // relative, todo: account for sign (is this two's comp?)
-            //cpu->pc += mem->readmem(cpu->pc + mem->readmem(cpu->pc+1));
-            // absolute:
-            //cpu->pc = mem->readmem(revlendianbytes(cpu->pc+2, cpu->pc+1));
+            cpu->pc = relative(cpu, mem);
         }
     }
     // form aaabbbcc instruction
@@ -57,10 +51,15 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
     return 1;       // replace this with cycles used?
 }
 
+/**
+ * The flag indicated by xx is compared with y, and the branch is taken if they are equal.
+ * this gives us: BPL, BMI, BVC, BVS, BCC, BCS, BNE, BEQ
+ * @param opcode
+ * @return
+ */
 bool InstructionDecoder::decode_branch(uint8_t opcode)
 {
-    // The flag indicated by xx is compared with y, and the branch is taken if they are equal.
-    // this gives us: BPL, BMI, BVC, BVS, BCC, BCS, BNE, BEQ
+
     uint8_t xx = (opcode & 0b11000000) >> 6;
     int flag;
     bool y = (opcode & 0b00100000) >> 5;

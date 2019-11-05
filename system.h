@@ -127,6 +127,7 @@ class Famicom {
 };
 
 uint16_t revlendianbytes(uint8_t, uint8_t);
+int8_t decode_twos_comp(uint8_t);
 
 cpustate * initcpu();
 
@@ -159,6 +160,15 @@ void rolmem(cpustate *, Memory *, uint16_t);
 void decreg(cpustate *, uint8_t *);
 void decmem(cpustate *, Memory *, uint16_t);
 
+// jump instructions
+// todo: define interface
+void rti();
+void rts();
+void jsr();
+void jmp();
+void brk();
+
+
 // addressing modes
 uint16_t immediate(cpustate *);
 
@@ -177,5 +187,7 @@ uint16_t indirectindexed(cpustate *, Memory *);
 uint16_t absolutey(cpustate *, Memory *);
 
 uint16_t absolutex(cpustate *, Memory *);
+
+uint16_t relative(cpustate *, Memory *);
 
 #endif

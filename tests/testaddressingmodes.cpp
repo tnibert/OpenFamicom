@@ -39,3 +39,9 @@ void TestAddressingModes::test_indirectindexed()
     mem->writemem(0x87, 0x40);
     CPPUNIT_ASSERT( indirectindexed(cpu, mem) == 0x4038 );
 }
+
+void TestAddressingModes::test_relative()
+{
+    // todo: finish this unit test
+    //CPPUNIT_ASSERT( relative() == BLAH);
+}

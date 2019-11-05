@@ -82,6 +82,7 @@ class TestAddressingModes : public CppUnit::TestFixture
         void test_indirectindexed();
         void test_absolutey();
         void test_absolutex();
+        void test_relative();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestAddressingModes );

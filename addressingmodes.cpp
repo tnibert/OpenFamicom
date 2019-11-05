@@ -138,3 +138,16 @@ uint16_t absolutex(cpustate * cpu, Memory * mem)
     addr += cpu->x;
     return addr;
 }
+
+/**
+ * Relative addressing
+ * used for branch instructions
+ * @param cpu
+ * @param mem
+ * @return
+ */
+uint16_t relative(cpustate * cpu, Memory * mem)
+{
+    cpu->pc += 1;
+    return cpu->pc + decode_twos_comp(mem->readmem(cpu->pc));
+}
