@@ -23,13 +23,16 @@ Famicom::Famicom(unsigned char * rom) {
     decoder = new InstructionDecoder(cpu, memory);
 }
 
+
+/**
+ * 6502 is little endian.  Therefore we must swap bytes to resolve final addresses
+ * e.g. in memory 0x28 followed in 0x40 resolves the the 16 bit address 0x4028
+ * @param lsig: least significant byte
+ * @param msig: most significant byte
+ * @return 16 bit value
+ */
 uint16_t revlendianbytes(uint8_t lsig, uint8_t msig)
 {
-    /*
-     * lsig == lest significant
-     * msig == most significant
-     * In the rom, the least significant bit comes first
-     */
     uint16_t offset = (msig<<8) | (lsig);
     return offset;
 }

@@ -16,7 +16,6 @@
  * with one addressing mode, but don't for another (e.g. accumulator, immediate)
  *
  * todo: double check these, unit test
- * todo: confirm correct usage of revlendianbytes() and necessity
  * todo: update cycle count for every memory access
  */
 
@@ -52,7 +51,6 @@ uint8_t zeropage(cpustate * cpu, Memory * mem)
 uint16_t absolute(cpustate * cpu, Memory * mem)
 {
     cpu->pc+=2;
-    // is revlendianbytes() necessary?
     return revlendianbytes(mem->readmem(cpu->pc-1), mem->readmem(cpu->pc));
 }
 
