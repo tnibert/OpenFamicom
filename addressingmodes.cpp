@@ -82,31 +82,31 @@ uint8_t zeropagey(cpustate * cpu, Memory * mem)
 }
 
 /**
- * Todo: figure this one out
+ * (Indirect,X) aka (zero page,X)
+ * The address of the table is taken from the instruction and the X register added to it (with zero page wrap around)
+ * to give the location of the least significant byte of the target address.
  * @param cpu
  * @param mem
  * @return Final resolved address
  */
 uint16_t indexedindirect(cpustate * cpu, Memory * mem)
 {
-    // (Indirect,X) aka (zero page,X)
     cpu->pc++;
     uint8_t zpageaddr = mem->readmem(cpu->pc);
     uint16_t addr = zpageaddr + cpu->x;
-    // we have to read from addr to find the new addr to load from?
     uint16_t finaladdr = revlendianbytes(mem->readmem(addr), mem->readmem(addr+1));
     return finaladdr;
 }
 
 /**
- * Todo: figure this one out
+ * (Indirect),Y aka (zero page),Y
+ * Y is added to final address at very end
  * @param cpu
  * @param mem
  * @return Final resolved address
  */
 uint16_t indirectindexed(cpustate * cpu, Memory * mem)
 {
-    // (Indirect),Y aka (zero page),Y
     cpu->pc++;
     uint8_t zpageaddr = mem->readmem(cpu->pc);
     uint16_t addr = (revlendianbytes(mem->readmem(zpageaddr), mem->readmem(zpageaddr+1))) + cpu->y;
