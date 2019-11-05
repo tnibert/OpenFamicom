@@ -127,5 +127,17 @@ class TestDecoder : public CppUnit::TestFixture
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestDecoder );
 
+class TestUtilFuncs : public CppUnit::TestFixture
+{
+    CPPUNIT_TEST_SUITE( TestUtilFuncs );
+    CPPUNIT_TEST( test_decode_twos_comp );
+    CPPUNIT_TEST_SUITE_END();
+
+    public:
+        void test_decode_twos_comp();
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( TestUtilFuncs );
+
 #endif //OPENNES_SYSTEMTESTS_H
 

@@ -37,6 +37,25 @@ uint16_t revlendianbytes(uint8_t lsig, uint8_t msig)
     return offset;
 }
 
+/**
+ * Convert a two's comp value to regular signed number
+ * @param in
+ * @return
+ */
+int8_t decode_twos_comp(uint8_t in)
+{
+    // if not two's comp, return the original number
+    if((in & 0b10000000) == 0b0)
+    {
+        return in;
+    }
+    else
+    {
+        uint8_t minusone = in - 0b1;
+        return -(~minusone);
+    }
+}
+
 cpustate * initcpu()
 {
     // initialize cpu state
