@@ -28,7 +28,28 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
     printf("In decode and execute: op: %x, pc: %x\n", opcode, cpu->pc);
 
     // todo: single byte instructions
+    if((opcode & 0x8) == 0x8)           // 0b1000
+    {
+
+    }
+    else if((opcode & 0xA) == 0xA)      // 0b1010
+    {
+
+    }
+
     // todo: BRK, JSR abs, RTI, RTS
+    switch(opcode)
+    {
+        case 0x0:           // BRK
+            break;
+        case 0x20:          // JSR abs
+            break;
+        case 0x40:          // RTI
+            break;
+        case 0x60:          // RTS
+            break;
+    }
+
 
     // The conditional branch instructions all have the form xxy10000
     // they use relative addressing
@@ -43,6 +64,7 @@ int InstructionDecoder::decode_and_execute(uint8_t opcode)
         }
     }
     // form aaabbbcc instruction
+    // todo: perhaps make this more specific than just else
     else
     {
         decode_aaabbbcc(opcode);

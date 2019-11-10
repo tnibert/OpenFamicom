@@ -25,10 +25,8 @@ int main(int argc, char**argv)
     // create and init state machine
     Famicom * nes = new Famicom(buffer);
 
-    /* engine to iterate through buffer,
-       call opcode->f() for each opcode passed in */
 
-    /* so this is iterating over the prgrom, which I believe contains the instructions... */
+    /* so this is iterating over the prgrom */
     while (nes->getpc() < PRGROMSTART+nes->cart->prgromsize)
     {
         //printf("%x : %x\n", nes->getpc(), fsize);

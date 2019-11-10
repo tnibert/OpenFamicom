@@ -123,7 +123,12 @@ class TestDecoder : public CppUnit::TestFixture
         void setUp();
         void test_branching();
         void test_aaabbbcc();
-        void test_singlebyte();
+        void test_singlebyte0x8();
+        void test_singlebyte0xa();
+        void test_brk();
+        void test_rti();
+        void test_jsrabs();
+        void test_rts();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestDecoder );
