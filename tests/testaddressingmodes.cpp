@@ -42,6 +42,22 @@ void TestAddressingModes::test_indirectindexed()
 
 void TestAddressingModes::test_relative()
 {
-    // todo: finish this unit test
-    //CPPUNIT_ASSERT( relative() == BLAH);
+    // test positive branch
+    cpu->pc++;
+    mem->writemem(2, 80);
+    cpu->pc = relative(cpu, mem);
+    CPPUNIT_ASSERT( cpu->pc == 82);
+
+    // test negative branch
+    cpu->pc++;
+    mem->writemem(84, -80);
+    cpu->pc = relative(cpu, mem);
+    CPPUNIT_ASSERT( cpu->pc == 4);
+
+    // todo: what should happen if the branch goes below zero?
+    // test wrap
+    //cpu->pc++;
+    //mem->writemem(6, -8);
+    //cpu->pc = relative(cpu, mem);
+    //std::cout << cpu->pc << std::endl;
 }

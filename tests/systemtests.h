@@ -66,6 +66,7 @@ class TestAddressingModes : public CppUnit::TestFixture
     CPPUNIT_TEST( test_zeropage );
     CPPUNIT_TEST( test_indexedindirect );
     CPPUNIT_TEST( test_indirectindexed );
+    CPPUNIT_TEST( test_relative );
     CPPUNIT_TEST_SUITE_END();
 
     private:
