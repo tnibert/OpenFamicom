@@ -6,3 +6,7 @@ all:
 
 test:
 	g++ $(TESTOBJS) -std=c++11 -lcppunit -o TestOpenFamicom
+
+clean:
+	rm -f OpenFamicom
+	rm -f TestOpenFamicom
